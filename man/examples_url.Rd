@@ -2,8 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{examples_url}
 \alias{examples_url}
-\title{examples_url
-provides the URL for the desired example data}
+\title{Examples URL}
 \usage{
 examples_url(example)
 }
@@ -12,11 +11,13 @@ examples_url(example)
 }
 \value{
 the full URL for the desired example
+
+an URL string
 }
 \description{
-examples_url
-provides the URL for the desired example data
+Provides the URL for the desired example data, so that it can be more easily
+downloaded.
 }
 \examples{
-examples_url("train.csv")
+examples_url("battery.dat") \%>\% read.table(header=T)
 }

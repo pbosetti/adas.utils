@@ -2,9 +2,7 @@
 % Please edit documentation in R/stats.R
 \name{chauvenet}
 \alias{chauvenet}
-\title{chauvenet
-Applies the Chauvenet's criterion to a sample, identifying a possible
-outlier.}
+\title{Chauvenet's criterion}
 \usage{
 chauvenet(x, threshold = 0.5)
 }
@@ -23,7 +21,6 @@ a list with the following components:
 }
 }
 \description{
-chauvenet
 Applies the Chauvenet's criterion to a sample, identifying a possible
 outlier.
 }
