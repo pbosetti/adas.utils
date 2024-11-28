@@ -10,7 +10,7 @@
 #' @return an URL string
 #'
 #' @examples
-#' examples_url("battery.dat") %>% read.table(header=T)
+#' examples_url("battery.dat") |> read.table(header=T)
 examples_url <- function(example) {
   url = paste0("https://paolobosetti.quarto.pub/data/", example)
   return(url)
