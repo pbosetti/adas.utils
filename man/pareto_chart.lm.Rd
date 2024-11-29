@@ -19,5 +19,5 @@ model, their sign, and the cumulative effect.
 Creates a Pareto chart for the effects of a linear model.
 }
 \examples{
-pareto_chart(lm(mpg ~ wt + hp, data=mtcars))
+pareto_chart(lm(Y~A*B*C*D, data=filtration))
 }

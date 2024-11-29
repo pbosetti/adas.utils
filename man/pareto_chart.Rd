@@ -16,5 +16,15 @@ a Pareto chart of the effects of the model
 This is a generic function for Pareto's chart.
 }
 \examples{
-pareto_chart(lm(mpg ~ wt + hp, data=mtcars))
+# For a data frame:
+library(tidyverse)
+set.seed(1)
+tibble(
+  val=rnorm(10, sd=5),
+  cat=LETTERS[1:length(val)]
+  ) \%>\%
+  pareto_chart(labels=cat, values=val)
+
+# For a linear model:
+pareto_chart(lm(Y~A*B*C*D, data=filtration))
 }

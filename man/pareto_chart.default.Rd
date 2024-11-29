@@ -23,5 +23,11 @@ data frame, their sign, and the cumulative value.
 Create a Pareto chart for a data frame.
 }
 \examples{
-pareto_chart(mtcars)
+library(tidyverse)
+set.seed(1)
+tibble(
+  val=rnorm(10, sd=5),
+  cat=LETTERS[1:length(val)]
+  ) \%>\%
+  pareto_chart(labels=cat, values=val)
 }

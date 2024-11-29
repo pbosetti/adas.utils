@@ -55,7 +55,7 @@ chauvenet <- function(x, threshold=0.5) {
 #' @export
 #'
 #' @examples
-#' daniel_plot(lm(mpg ~ wt, data=mtcars))
+#' daniel_plot(lm(Y~A*B*C*D, data=filtration))
 daniel_plot <- function(model, alpha=0.5, xlim=c(-3,3)) {
   e <- effects(model)
   tibble::tibble(
@@ -83,7 +83,17 @@ daniel_plot <- function(model, alpha=0.5, xlim=c(-3,3)) {
 #' @export
 #'
 #' @examples
-#' pareto_chart(lm(mpg ~ wt + hp, data=mtcars))
+#' # For a data frame:
+#' library(tidyverse)
+#' set.seed(1)
+#' tibble(
+#'   val=rnorm(10, sd=5),
+#'   cat=LETTERS[1:length(val)]
+#'   ) %>%
+#'   pareto_chart(labels=cat, values=val)
+#'
+#' # For a linear model:
+#' pareto_chart(lm(Y~A*B*C*D, data=filtration))
 pareto_chart <- function(...) {
   UseMethod("pareto_chart")
 }
@@ -103,7 +113,13 @@ pareto_chart <- function(...) {
 #' data frame, their sign, and the cumulative value.
 #'
 #' @examples
-#' pareto_chart(mtcars)
+#' library(tidyverse)
+#' set.seed(1)
+#' tibble(
+#'   val=rnorm(10, sd=5),
+#'   cat=LETTERS[1:length(val)]
+#'   ) %>%
+#'   pareto_chart(labels=cat, values=val)
 pareto_chart.default <- function(data, labels, values) {
   stopifnot(is.data.frame(data))
   df <- data |>
@@ -143,7 +159,7 @@ pareto_chart.default <- function(data, labels, values) {
 #' model, their sign, and the cumulative effect.
 #'
 #' @examples
-#' pareto_chart(lm(mpg ~ wt + hp, data=mtcars))
+#' pareto_chart(lm(Y~A*B*C*D, data=filtration))
 pareto_chart.lm <- function(model) {
   tibble::tibble(
     effect = 2*coef(model),
@@ -165,7 +181,14 @@ pareto_chart.lm <- function(model) {
 #' @export
 #'
 #' @examples
-#' normplot(mtcars, mpg)
+#' library(tidyverse)
+#' df <- tibble(
+#'   xn = rnorm(100, mean=20, sd=5),
+#'   xu = runif(100, min=0, max=40)
+#' )
+#'
+#' df |> normplot(xn)
+#' df |> normplot(xu)
 normplot <- function(data, var, breaks=seq(0.1, 0.9, 0.1), linecolor="red") {
   m <- data |> dplyr::pull({{var}}) |> mean()
   s <- data |> dplyr::pull({{var}}) |> sd()
