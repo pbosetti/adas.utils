@@ -118,7 +118,6 @@ pareto_chart.default <- function(data, labels, values) {
     )
 
   p <- df |>
-    dplyr::mutate(sign=ifelse(sign<0, "negative", "positive")) |>
     ggplot2::ggplot(ggplot2::aes(x=labels, group=1)) +
     ggplot2::geom_col(ggplot2::aes(y=effect, fill=sign)) +
     ggplot2::geom_line(ggplot2::aes(y=cum)) +
