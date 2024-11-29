@@ -117,7 +117,7 @@ pareto_chart.default <- function(data, labels, values) {
       labels = factor({{labels}}, levels={{labels}}, ordered=TRUE)
     )
 
-  p <- df |>
+  df |>
     ggplot2::ggplot(ggplot2::aes(x=labels, group=1)) +
     ggplot2::geom_col(ggplot2::aes(y=effect, fill=sign)) +
     ggplot2::geom_line(ggplot2::aes(y=cum)) +
@@ -129,8 +129,6 @@ pareto_chart.default <- function(data, labels, values) {
         breaks=seq(0, 100, 10)
       )
     )
-  print(p)
-  invisible(df)
 }
 
 #' Pareto's chart
@@ -152,8 +150,7 @@ pareto_chart.lm <- function(model) {
     factor=names(effect)
   ) |>
     dplyr::filter(factor != "(Intercept)") |>
-    pareto_chart(labels=factor, values=effect) |>
-    invisible()
+    pareto_chart(labels=factor, values=effect)
 }
 
 
