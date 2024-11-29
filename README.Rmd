@@ -9,7 +9,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "50%"
 )
 library(adas.utils)
 ```
@@ -76,3 +76,6 @@ tibble(
 pareto_chart(lm(Y~A*B*C*D, data=filtration))
 ```
 
+# Author
+
+Paolo Bosetti, University of Trento

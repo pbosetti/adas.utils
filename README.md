@@ -51,7 +51,7 @@ x[50] <- 10
 chauvenet(x)
 #> Chauvenet's criterion for sample x
 #> Suspect outlier: 50, value 10
-#> Expected frequency: 2.183948168318e-10, threshold: 0.5
+#> Expected frequency: 1.42479894534883e-10, threshold: 0.5
 #> Decision: reject it
 ```
 
@@ -64,7 +64,7 @@ model. Here is an example:
 daniel_plot(lm(Y~A*B*C*D, data=filtration))
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="50%" />
 
 ### Pareto chart
 
@@ -92,7 +92,7 @@ tibble(
   pareto_chart(labels=cat, values=val)
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="50%" />
 
 ``` r
 
@@ -100,4 +100,8 @@ tibble(
 pareto_chart(lm(Y~A*B*C*D, data=filtration))
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-2.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-2.png" width="50%" />
+
+# Author
+
+Paolo Bosetti, University of Trento
