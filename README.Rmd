@@ -1,0 +1,78 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+library(adas.utils)
+```
+
+# adas.utils
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of adas.utils is to provide some utility functions to be used in the course *Analysis of Data and Statistics* at the University of Trento, Italy. Course contents are on <https://paolobosetti.quarto.pub/ADAS/>.
+
+
+## Installation
+
+You can install the development version of adas.utils from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("pbosetti/adas.utils")
+```
+
+## Examples
+
+### Loading data sets
+
+On <https://paolobosetti.quarto.pub/data.html> there are a list of example datasets to be used during the course. You can load them with the `examples_url` function:
+
+```{r}
+examples_url("battery.dat") |> read.table(header=T) |> head()
+```
+
+### Chauvenet's criterion
+
+The Chauvenet's criterion is a method to identify possible outliers in a sample. Here is an example:
+
+```{r}
+x <- rnorm(100)
+x[50] <- 10
+chauvenet(x)
+```
+
+### Daniel's plot
+
+Daniel's plot is a QQ plot of the effects of a non-replicated factorial model. Here is an example:
+
+```{r}
+daniel_plot(lm(Y~A*B*C*D, data=filtration))
+```
+
+### Pareto chart
+
+The `pareto_chart` function is a generic function taht creates a Pareto chart either from a general data frame or from the effects of a `lm` object. Here is an example:
+
+```{r}
+library(tidyverse)
+set.seed(1)
+tibble(
+  val=rnorm(10, sd=5),
+  cat=LETTERS[1:length(val)]
+  ) %>%
+  pareto_chart(labels=cat, values=val)
+
+# For a linear model:
+pareto_chart(lm(Y~A*B*C*D, data=filtration))
+```
+
