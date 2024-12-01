@@ -28,6 +28,6 @@ set.seed(1)
 tibble(
   val=rnorm(10, sd=5),
   cat=LETTERS[1:length(val)]
-  ) |>
+  ) \%>\%
   pareto_chart(labels=cat, values=val)
 }

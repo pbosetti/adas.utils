@@ -28,6 +28,6 @@ df <- tibble(
   xu = runif(100, min=0, max=40)
 )
 
-df |> normplot(xn)
-df |> normplot(xu)
+df \%>\% normplot(xn)
+df \%>\% normplot(xu)
 }

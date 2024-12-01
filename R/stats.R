@@ -1,5 +1,6 @@
-library(glue)
-library(tidyverse)
+require(glue)
+require(magrittr)
+require(purrr)
 
 #' Chauvenet's criterion
 #'
@@ -61,8 +62,8 @@ daniel_plot <- function(model, alpha=0.5, xlim=c(-3,3)) {
   tibble::tibble(
     term = names(e),
     value = as.numeric(e)
-  ) |>
-    dplyr::slice_tail(n=length(e) - 1) |>
+  ) %>%
+    dplyr::slice_tail(n=length(e) - 1) %>%
     ggplot2::ggplot(ggplot2::aes(sample=value)) +
     ggplot2::stat_qq() +
     ggplot2::geom_qq_line(color="red") +
@@ -91,7 +92,7 @@ daniel_plot <- function(model, alpha=0.5, xlim=c(-3,3)) {
 #' tibble(
 #'   val=rnorm(10, sd=5),
 #'   cat=LETTERS[1:length(val)]
-#'   ) |>
+#'   ) %>%
 #'   pareto_chart(labels=cat, values=val)
 #'
 #' # For a linear model:
@@ -120,22 +121,22 @@ pareto_chart <- function(...) {
 #' tibble(
 #'   val=rnorm(10, sd=5),
 #'   cat=LETTERS[1:length(val)]
-#'   ) |>
+#'   ) %>%
 #'   pareto_chart(labels=cat, values=val)
 pareto_chart.default <- function(data, labels, values) {
   stopifnot(is.data.frame(data))
-  df <- data |>
+  df <- data %>%
     dplyr::mutate(
       sign=ifelse({{values}}<0, "negative", "positive"),
       effect = abs({{values}}),
-    ) |>
-    dplyr::arrange(dplyr::desc(effect)) |>
+    ) %>%
+    dplyr::arrange(dplyr::desc(effect)) %>%
     dplyr::mutate(
       cum = cumsum(effect),
       labels = factor({{labels}}, levels={{labels}}, ordered=TRUE)
     )
 
-  df |>
+  df %>%
     ggplot2::ggplot(ggplot2::aes(x=labels, group=1)) +
     ggplot2::geom_col(ggplot2::aes(y=effect, fill=sign)) +
     ggplot2::geom_line(ggplot2::aes(y=cum)) +
@@ -166,9 +167,9 @@ pareto_chart.lm <- function(model) {
   tibble::tibble(
     effect = 2*coef(model),
     factor=names(effect)
-  ) |>
-    na.omit() |>
-    dplyr::filter(factor != "(Intercept)") |>
+  ) %>%
+    na.omit() %>%
+    dplyr::filter(factor != "(Intercept)") %>%
     pareto_chart(labels=factor, values=effect)
 }
 
@@ -190,15 +191,15 @@ pareto_chart.lm <- function(model) {
 #'   xu = runif(100, min=0, max=40)
 #' )
 #'
-#' df |> normplot(xn)
-#' df |> normplot(xu)
+#' df %>% normplot(xn)
+#' df %>% normplot(xu)
 normplot <- function(data, var, breaks=seq(0.1, 0.9, 0.1), linecolor="red") {
-  m <- data |> dplyr::pull({{var}}) |> mean()
-  s <- data |> dplyr::pull({{var}}) |> sd()
+  m <- data %>% dplyr::pull({{var}}) %>% mean()
+  s <- data %>% dplyr::pull({{var}}) %>% sd()
 
-  data |>
-    dplyr::mutate(ecdf = ecdf({{var}})({{var}})) |>
-    dplyr::arrange({{var}}) |>
+  data %>%
+    dplyr::mutate(ecdf = ecdf({{var}})({{var}})) %>%
+    dplyr::arrange({{var}}) %>%
     ggplot2::ggplot(ggplot2::aes(x={{var}}, y=ecdf)) +
     ggplot2::geom_point() +
     ggplot2::geom_function(fun = pnorm, args=list(mean=m, sd=s), color=linecolor) +
@@ -233,16 +234,16 @@ normplot <- function(data, var, breaks=seq(0.1, 0.9, 0.1), linecolor="red") {
 #' # A 3^3 factorial plan, teplicated 2 times:
 #' design_matrix(3, rep=2, levels=-1:1)
 design_matrix <- function(n_factors, rep = 1, levels = c(-1,1)) {
-  LETTERS[1:n_factors] |>
-    (\(.) purrr::set_names(.))() |>
-    purrr::map(~ levels) |>
-    purrr::list_merge(rep=1:rep) |>
-    (\(.) do.call(what=expand.grid, args=.))() |>
+  LETTERS[1:n_factors] %>%
+    purrr::set_names(.) %>%
+    purrr::map(~ levels) %>%
+    purrr::list_merge(rep=1:rep) %>%
+    do.call(what=expand.grid, args=.) %>%
     dplyr::mutate(
       StdOrder = 1:dplyr::n(),
       RunOrder = sample(dplyr::n()),
       .before = A
-    ) |>
-    dplyr::relocate(rep, .before=A) |>
+    ) %>%
+    dplyr::relocate(rep, .before=A) %>%
     dplyr::mutate(Y=NA)
 }

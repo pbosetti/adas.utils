@@ -2,9 +2,11 @@
 
 S3method(pareto_chart,default)
 S3method(pareto_chart,lm)
+export("%>%")
 export(chauvenet)
 export(daniel_plot)
 export(design_matrix)
 export(examples_url)
 export(normplot)
 export(pareto_chart)
+importFrom(magrittr,"%>%")
