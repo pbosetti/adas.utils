@@ -28,3 +28,6 @@ tibble(
 # For a linear model:
 pareto_chart(lm(Y~A*B*C*D, data=filtration))
 }
+\seealso{
+\code{\link[=pareto_chart.default]{pareto_chart.default()}} \code{\link[=pareto_chart.lm]{pareto_chart.lm()}}
+}

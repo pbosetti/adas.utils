@@ -82,6 +82,8 @@ daniel_plot <- function(model, alpha=0.5, xlim=c(-3,3)) {
 #' @return a Pareto chart of the effects of the model
 #' @export
 #'
+#' @seealso [pareto_chart.default()] [pareto_chart.lm()]
+#'
 #' @examples
 #' # For a data frame:
 #' library(tidyverse)
@@ -165,6 +167,7 @@ pareto_chart.lm <- function(model) {
     effect = 2*coef(model),
     factor=names(effect)
   ) |>
+    na.omit() |>
     dplyr::filter(factor != "(Intercept)") |>
     pareto_chart(labels=factor, values=effect)
 }
