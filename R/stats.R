@@ -91,7 +91,7 @@ daniel_plot <- function(model, alpha=0.5, xlim=c(-3,3)) {
 #' tibble(
 #'   val=rnorm(10, sd=5),
 #'   cat=LETTERS[1:length(val)]
-#'   ) %>%
+#'   ) |>
 #'   pareto_chart(labels=cat, values=val)
 #'
 #' # For a linear model:
@@ -120,7 +120,7 @@ pareto_chart <- function(...) {
 #' tibble(
 #'   val=rnorm(10, sd=5),
 #'   cat=LETTERS[1:length(val)]
-#'   ) %>%
+#'   ) |>
 #'   pareto_chart(labels=cat, values=val)
 pareto_chart.default <- function(data, labels, values) {
   stopifnot(is.data.frame(data))
@@ -206,4 +206,43 @@ normplot <- function(data, var, breaks=seq(0.1, 0.9, 0.1), linecolor="red") {
       trans=scales::probability_trans("norm"),
       breaks=breaks) +
     ggplot2::labs(y="Normal probability")
+}
+
+
+#' Generate the design matrix for a factorial experiment
+#'
+#' The function produces a design matrix for a factorial experiment. The
+#' function takes the number of factors, the number of replications, and the
+#' levels of the factors as arguments. The function returns a tibble with the
+#' design matrix. The design matrix also has the `StdOrder` and `RunOrder`
+#' columns, which are the standard order and the random order of the runs,
+#' respectively. Also, a NA column `Y` is added for the response variable.
+#'
+#' @param n_factors the number of factors (a scalar)
+#' @param rep the number of replications (a scalar)
+#' @param levels the levels of the factors (a vector)
+#'
+#' @return a design matrix (as a tibble). The design matrix also has the
+#' `StdOrder` and `RunOrder` columns, which are the standard order and the
+#' random order of the runs, respectively. Also, a NA column `Y` is added for
+#' the response variable.
+#'
+#' @export
+#'
+#' @examples
+#' # A 3^3 factorial plan, teplicated 2 times:
+#' design_matrix(3, rep=2, levels=-1:1)
+design_matrix <- function(n_factors, rep = 1, levels = c(-1,1)) {
+  LETTERS[1:n_factors] |>
+    (\(.) purrr::set_names(.))() |>
+    purrr::map(~ levels) |>
+    purrr::list_merge(rep=1:rep) |>
+    (\(.) do.call(what=expand.grid, args=.))() |>
+    dplyr::mutate(
+      StdOrder = 1:dplyr::n(),
+      RunOrder = sample(dplyr::n()),
+      .before = A
+    ) |>
+    dplyr::relocate(rep, .before=A) |>
+    dplyr::mutate(Y=NA)
 }
