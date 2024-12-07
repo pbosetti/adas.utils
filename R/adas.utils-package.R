@@ -2,6 +2,8 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @importFrom dplyr across
+#' @importFrom dplyr add_row
 #' @importFrom dplyr arrange
 #' @importFrom dplyr bind_rows
 #' @importFrom dplyr desc

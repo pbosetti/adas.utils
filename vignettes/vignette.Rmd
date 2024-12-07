@@ -1,0 +1,82 @@
+---
+title: "ADAS Utils vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(adas.utils)
+library(tidyverse)
+```
+
+# Factorial plans
+
+The package provides tools for dealing with factorial plan according to the Design of Experiments protocols.
+
+## Full factorial plan
+
+You can create a full factorial plan with the `fp_design_matrix` function, passing the number of factors:
+```{r}
+(dm <- fp_design_matrix(2, rep=2) %>% 
+  mutate(Y=rnorm(n())))
+```
+
+In this case, the factors are the first `n` capital letters.
+
+If you want different factor names, use a formula combining all the named factors with `*`:
+
+```{r}
+fp_design_matrix(~Speed*Weight)
+```
+
+The yield column `Y` must then be completed according to the randomized `RunOrder` column.
+
+## Custom levels
+
+If you want a $k^n$ factorial plan with custom levels, pass the `levels` argument. In this case, though, the `.treat` column with Yate's treatment codes would be `NA`:
+
+```{r}
+fp_design_matrix(2, levels=-1:1)
+```
+
+## Augment a plan
+
+you can augment a plan by adding a central point, typically repeated:
+
+```{r}
+fp_design_matrix(2, rep=2) %>% 
+  fp_augment_center()
+```
+
+
+## Fractional factorial plan
+
+A full $2^n$ factorial plan can be then reduced to a fractional factorial plan $2^{n-p}$ by applying the `fp_fraction` function $p$ times. For example, to get a $2^{5-2}$ plan with the defining relationships $I=ABCD$ and $I=BCDE$:
+
+```{r}
+fp_design_matrix(5) %>% 
+  fp_fraction(~A*B*C*D) %>% 
+  fp_fraction(~B*C*D*E)
+```
+
+Note that with the `remove` option you can control if you want to keep both fractions, and later on `filter(ABC==1)` them out.
+
+```{r}
+fp_design_matrix(3) %>% 
+  fp_fraction(~A*B*C, remove=FALSE)
+```
+
+
+## Alias structure
+
+The functions `fp_alias` and `fp_alias_list` can be used to generate the alias structure of a fractional factorial plan. **This functionalities are currently under development**

@@ -77,14 +77,16 @@ fp_design_matrix <- function(arg, rep = 1, levels = c(-1,1)) {
     mutate(
       StdOrder = 1:n(),
       RunOrder = sample(n()),
-      .treat= rep(fp_treatments(arg), rep),
       .before = .data[[fct[1]]]
     ) %>%
     relocate(.rep, .before=.data[[fct[1]]]) %>%
     mutate(Y=NA)
+  if (length(levels) == 2) dm <- mutate(dm, .treat= rep(fp_treatments(arg), rep), .after=RunOrder)
   class(dm) <- c("factorial.plan", class(dm))
   attr(dm, "def.rel") <- fp_defrel(arg)
+  attr(dm, "factors") <- fct
   attr(dm, "fraction") <- NA
+  attr(dm, "levels") <- levels
   return(dm)
 }
 
@@ -257,4 +259,36 @@ fp_fraction <- function(dm, formula, remove=TRUE) {
     return(dm %>% filter (!!rlang::sym(i) == sign))
   else
     return(dm)
+}
+
+
+
+#' Augment to a central composite design
+#'
+#' Add the central points to an existing $2^n$ factorial plan.
+#'
+#' @param dm A factorial plan table
+#' @param rep The number of replications
+#'
+#' @return A central composite design
+#' @export
+#'
+#' @examples
+#' fp_design_matrix(3) %>%
+#'  fp_augment_center()
+fp_augment_center <- function(dm, rep=5) {
+  stopifnot("factorial.plan" %in% class(dm))
+  r <- nrow(dm)
+  fct <- attr(dm, "factors")
+
+  dm %>%
+    add_row(
+      StdOrder = (r+1):(r+rep),
+      RunOrder = sample((r+1):(r+rep)),
+      .treat = "0",
+      .rep = 1:rep,
+    ) %>%
+    mutate(
+      across({fct}, ~ 0)
+    )
 }
