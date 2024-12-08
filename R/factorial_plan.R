@@ -263,7 +263,7 @@ fp_fraction <- function(dm, formula, remove=TRUE) {
 
 
 
-#' Augment to a central composite design
+#' Augment to a centered design
 #'
 #' Add the central points to an existing $2^n$ factorial plan.
 #'
@@ -281,7 +281,7 @@ fp_augment_center <- function(dm, rep=5) {
   r <- nrow(dm)
   fct <- attr(dm, "factors")
 
-  dm %>%
+  dm <- dm %>%
     add_row(
       StdOrder = (r+1):(r+rep),
       RunOrder = sample((r+1):(r+rep)),
@@ -291,4 +291,44 @@ fp_augment_center <- function(dm, rep=5) {
     mutate(
       across({fct}, ~ 0)
     )
+  attr(dm, "type") <- "centered"
+  return(dm)
+}
+
+
+#' Augment to a central composite design
+#'
+#' Adds the axial points to a $2^n$ centered factorial plan.
+#'
+#' @param dm A factorial plan table, with central points
+#' @param rep The number of replications
+#'
+#' @return A central composite design
+#' @export
+#'
+#' @examples
+#' fp_design_matrix(3) %>%
+#'   fp_augment_center(rep=4) %>%
+#'   fp_augment_axial()
+fp_augment_axial <- function(dm, rep=1) {
+  n <- length(attr(dm, "factors"))
+  dm <- dm %>%
+    bind_rows(
+      fp_design_matrix(attr(dm, "def.rel"), rep=rep, levels=(-1:1)*2^(n/4)) %>%
+        rowwise() %>%
+        mutate(
+          axial=prod(c_across(attr(., "factors")))==0,
+          center=sum(c_across(attr(., "factors")))==0
+        ) %>%
+        ungroup() %>%
+        filter(axial & !center) %>%
+        select(-axial, -center) %>%
+        mutate(
+          StdOrder=nrow(dm) + 1:n(),
+          RunOrder=sample(StdOrder),
+          .treat="axial"
+        )
+    )
+  attr(dm, "type") <- "composite"
+  return(dm)
 }

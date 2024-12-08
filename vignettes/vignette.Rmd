@@ -2,7 +2,7 @@
 title: "ADAS Utils vignette"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{vignette}
+  %\VignetteIndexEntry{adas.utils}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -51,11 +51,42 @@ fp_design_matrix(2, levels=-1:1)
 
 ## Augment a plan
 
-you can augment a plan by adding a central point, typically repeated:
+You can augment a plan by adding a central point, typically repeated:
 
 ```{r}
-fp_design_matrix(2, rep=2) %>% 
+fp_design_matrix(3) %>%
   fp_augment_center()
+```
+
+Then if needed you can add axial points to get a central composite design:
+
+```{r}
+fp_design_matrix(3) %>% 
+  fp_augment_center(rep=3) %>% 
+  fp_augment_axial(rep=2)
+```
+
+
+```{r}
+dm %>% 
+  bind_rows(
+    fp_design_matrix(attr(dm, "def.rel"), rep=rep, levels=(-1:1)*2^(n/4)) %>% 
+      rowwise() %>% 
+      mutate(
+        axial=prod(c_across(attr(., "factors")))==0, 
+        center=sum(c_across(attr(., "factors")))==0
+      ) %>% 
+      ungroup() %>%
+      filter(axial & !center) %>% 
+      select(-axial, -center) %>% 
+      mutate(
+        StdOrder=1:n() + nrow(.),
+        RunOrder=sample(StdOrder),
+        .treat="axial"
+      )
+  )
+
+  
 ```
 
 

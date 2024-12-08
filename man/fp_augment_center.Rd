@@ -2,7 +2,7 @@
 % Please edit documentation in R/factorial_plan.R
 \name{fp_augment_center}
 \alias{fp_augment_center}
-\title{Augment to a central composite design}
+\title{Augment to a centered design}
 \usage{
 fp_augment_center(dm, rep = 5)
 }
