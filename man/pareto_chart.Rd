@@ -4,10 +4,12 @@
 \alias{pareto_chart}
 \title{Pareto's chart}
 \usage{
-pareto_chart(...)
+pareto_chart(obj, ...)
 }
 \arguments{
-\item{model}{a model}
+\item{obj}{an object}
+
+\item{...}{further parameters to specialized functions}
 }
 \value{
 a Pareto chart of the effects of the model

@@ -2,7 +2,7 @@
 title: "ADAS Utils vignette"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{adas.utils}
+  %\VignetteIndexEntry{ADAS Utils vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -21,7 +21,7 @@ library(tidyverse)
 
 # Factorial plans
 
-The package provides tools for dealing with factorial plan according to the Design of Experiments protocols.
+The package provides tools for dealing with factorial plan according to the *Design of Experiments* (DoE) protocols. The functions for dealing with DoE have names starting with `fp_`. As much as possible, we are aiming at a tidyverse-like syntax, so that the functions can be used in a pipe.
 
 ## Full factorial plan
 
@@ -33,7 +33,7 @@ You can create a full factorial plan with the `fp_design_matrix` function, passi
 
 In this case, the factors are the first `n` capital letters.
 
-If you want different factor names, use a formula combining all the named factors with `*`:
+If you want different factor names, use a right-side-only formula combining all the named factors with `*`:
 
 ```{r}
 fp_design_matrix(~Speed*Weight)
@@ -55,10 +55,10 @@ You can augment a plan by adding a central point, typically repeated:
 
 ```{r}
 fp_design_matrix(3) %>%
-  fp_augment_center()
+  fp_augment_center(rep=4)
 ```
 
-Then if needed you can add axial points to get a central composite design:
+Then if needed (because the analysis show low p-value for the quadratic term) you can add axial points to get a central composite design:
 
 ```{r}
 fp_design_matrix(3) %>% 
@@ -66,28 +66,6 @@ fp_design_matrix(3) %>%
   fp_augment_axial(rep=2)
 ```
 
-
-```{r}
-dm %>% 
-  bind_rows(
-    fp_design_matrix(attr(dm, "def.rel"), rep=rep, levels=(-1:1)*2^(n/4)) %>% 
-      rowwise() %>% 
-      mutate(
-        axial=prod(c_across(attr(., "factors")))==0, 
-        center=sum(c_across(attr(., "factors")))==0
-      ) %>% 
-      ungroup() %>%
-      filter(axial & !center) %>% 
-      select(-axial, -center) %>% 
-      mutate(
-        StdOrder=1:n() + nrow(.),
-        RunOrder=sample(StdOrder),
-        .treat="axial"
-      )
-  )
-
-  
-```
 
 
 ## Fractional factorial plan
@@ -111,3 +89,89 @@ fp_design_matrix(3) %>%
 ## Alias structure
 
 The functions `fp_alias` and `fp_alias_list` can be used to generate the alias structure of a fractional factorial plan. **This functionalities are currently under development**
+
+
+# Statistics
+
+The package provides some useful functions for statistical analysys of data.
+
+## Plotting
+
+### Normal probability plot
+
+The normal probability plot is provided as an alternative to the quantile-quantile plot:
+
+```{r warning=FALSE}
+df <- tibble(
+  xn = rnorm(100, mean=20, sd=5),
+  xu = runif(100, min=0, max=40)
+)
+
+df %>% normplot(xn)
+df %>% normplot(xu)
+```
+
+### Pareto chart
+
+The Pareto chart is a bar chart that displays the relative importance of problems in a format that is very easy to interpret. The bars are sorted in descending order, and the cumulative percentage of the total is shown by the line.
+
+It can prove useful in the context of factorial plans, to identify the most important factors, or in sensityvity analysis, to identify the most important parameters.
+
+The package provides a *generic function*, `pareto_chart`, that can be used with a tibble (or a data frame), or with a linear model (an `lm` object). In the latter case, the function produces the Pareto chart of the model effects.
+
+For the general case, when you have a tibble with values and names:
+
+```{r}
+set.seed(1)
+tibble(
+  val=rnorm(10, sd=5),
+  cat=LETTERS[1:length(val)]
+  ) %>%
+  pareto_chart(labels=cat, values=val)
+```
+
+For the case of a linear model:
+
+```{r}
+filtration %>% 
+  lm(Y~A*B*C*D, data=.) %>%
+  pareto_chart()
+```
+
+### Daniel's plot
+
+In case of non-replicated factorial plans, the Daniel's plot can be used to identify the most important factors: a quantile-quantile plot of the factors effects shows the significant factors and interactions off the diagonal.
+
+```{r}
+daniel_plot_qq(lm(Y~A*B*C*D, data=filtration))
+```
+
+If you prefer, you can rather use a half-normal plot:
+
+```{r}
+filtration %>% 
+  lm(Y~A*B*C*D, data=.) %>%
+  daniel_plot_hn(nlab=6, repel=TRUE)
+
+```
+
+
+It shows that none of the effects containing the `B` factor are significant, so we can reduce the model to `Y~A*C*D`:
+
+```{r}
+filtration %>% 
+  lm(Y~A*C*D, data=.) %>%
+  anova()
+```
+
+Even better, the model can be further reduced to `Y~A*C+A*D`. Compare this conclusion with the last Pareto chart above.
+
+
+# Utilities
+
+This package also provides a function for easily loading data files made available on the accompanying course documentation on <https://paolobosetti.quarto.pub/data>:
+
+```{r}
+examples_url("battery.dat") %>%  read.table(header=TRUE)
+```
+

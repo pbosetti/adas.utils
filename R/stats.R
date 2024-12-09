@@ -39,7 +39,7 @@ chauvenet <- function(x, threshold=0.5) {
 }
 
 
-#' Daniel's plot
+#' Daniel's plot (quantile-quantile)
 #'
 #' Given a non-replicated model of a factorial plan, this function provides a
 #' QQ plot of the effects of the model, labeling all the effects.
@@ -52,8 +52,8 @@ chauvenet <- function(x, threshold=0.5) {
 #' @export
 #'
 #' @examples
-#' daniel_plot(lm(Y~A*B*C*D, data=filtration))
-daniel_plot <- function(model, alpha=0.5, xlim=c(-3,3)) {
+#' daniel_plot_qq(lm(Y~A*B*C*D, data=filtration))
+daniel_plot_qq <- function(model, alpha=0.5, xlim=c(-3,3)) {
   e <- effects(model)
   tibble(
     term = names(e),
@@ -70,11 +70,34 @@ daniel_plot <- function(model, alpha=0.5, xlim=c(-3,3)) {
 }
 
 
+#' Daniel's plot (half-normal)
+#'
+#' Given a non-replicated model of a factorial plan, this function provides a
+#' half-normal plot of the effects of the model, labeling the main n effects.
+#'
+#' @param model a linear model
+#' @param ... further argiuments to [gghalfnorm()]
+#'
+#' @return a half-normal plot with the effects of the model
+#' @export
+#' @seealso [gghalfnorm::gghalfnorm()]
+#'
+#' @examples
+#' daniel_plot_hn(lm(Y~A*B*C*D, data=filtration))
+daniel_plot_hn <- function(model, ...) {
+  effects(model) %>%
+    tail(-1) %>%
+    gghalfnorm(labs=names(.),...) +
+    labs(y="Theoretical quantiles", x="Sample quantiles")
+}
+
+
 #' Pareto's chart
 #'
 #' This is a generic function for Pareto's chart.
 #'
-#' @param model a model
+#' @param obj an object
+#' @param ... further parameters to specialized functions
 #'
 #' @return a Pareto chart of the effects of the model
 #' @export
@@ -93,7 +116,7 @@ daniel_plot <- function(model, alpha=0.5, xlim=c(-3,3)) {
 #'
 #' # For a linear model:
 #' pareto_chart(lm(Y~A*B*C*D, data=filtration))
-pareto_chart <- function(...) {
+pareto_chart <- function(obj, ...) {
   UseMethod("pareto_chart")
 }
 

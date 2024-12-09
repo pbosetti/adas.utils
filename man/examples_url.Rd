@@ -19,5 +19,5 @@ Provides the URL for the desired example data, so that it can be more easily
 downloaded.
 }
 \examples{
-examples_url("battery.dat") |> read.table(header=T)
+examples_url("battery.dat") |> read.table(header=TRUE)
 }

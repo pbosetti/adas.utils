@@ -19,6 +19,7 @@
 #' @importFrom dplyr slice_tail
 #' @importFrom dplyr summarize_all
 #' @importFrom dplyr ungroup
+#' @importFrom gghalfnorm gghalfnorm
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 coord_cartesian
 #' @importFrom ggplot2 geom_col
