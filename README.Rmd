@@ -12,6 +12,7 @@ knitr::opts_chunk$set(
   out.width = "50%"
 )
 library(adas.utils)
+library(magrittr)
 ```
 
 # adas.utils
@@ -28,7 +29,7 @@ You can install the development version of adas.utils from [GitHub](https://gith
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("pbosetti/adas.utils")
+devtools::install_github("pbosetti/adas.utils", build_vignettes = TRUE)
 ```
 
 ## Examples
@@ -56,7 +57,7 @@ chauvenet(x)
 Daniel's plot is a QQ plot of the effects of a non-replicated factorial model. Here is an example:
 
 ```{r}
-daniel_plot(lm(Y~A*B*C*D, data=filtration))
+daniel_plot_qq(lm(Y~A*B*C*D, data=filtration))
 ```
 
 ### Pareto chart
@@ -75,6 +76,27 @@ tibble(
 # For a linear model:
 pareto_chart(lm(Y~A*B*C*D, data=filtration))
 ```
+
+### Design of Experiments
+
+There is a host of functions to be used in the context of Design of Experiments. Here is an example to prepare a design matrix for a $2^{5-2}$ fractional factorial plan:
+
+```{r}
+fp_design_matrix(5) %>% 
+  fp_fraction(~A*B*C*D) %>% 
+  fp_fraction(~B*C*D*E)
+```
+
+You can also prepare a design matrix for a $2^n$ full factorial plan, and later on augment it with a central point and then to a central composite design with axial points:
+
+```{r}
+fp_design_matrix(3, rep=2) %>% 
+  fp_augment_center(rep=5) %>% 
+  fp_augment_axial(rep=2)
+```
+
+
+
 
 # Author
 
