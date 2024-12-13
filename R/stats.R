@@ -77,7 +77,7 @@ daniel_plot_qq <- function(model, alpha=0.5, xlim=c(-3,3)) {
 #' half-normal plot of the effects of the model, labeling the main n effects.
 #'
 #' @param model a linear model
-#' @param ... further arguments to [gghalfnorm()]
+#' @param ... further arguments to [gghalfnorm::gghalfnorm()]
 #'
 #' @return a half-normal plot with the effects of the model
 #' @export
