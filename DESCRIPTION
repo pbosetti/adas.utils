@@ -1,9 +1,9 @@
 Package: adas.utils
-Title: Utility functions for the ADAS course, University of Trento, Italy
+Title: Utility Functions for the ADAS Course, University of Trento, Italy
 Version: 1.0.0
 Authors@R: 
     person("Paolo", "Bosetti", , "paolo.bosetti@unitn.it", role = c("aut", "cre"))
-Description: Utility functions for the ADAS course, University of Trento, Italy. The package contains functions to deal with Design of Experiments (DoE) factorial plans, with the addition of some utility function to perform some statistical analyses.
+Description: The package contains functions to create and analyze factorial plans according to the Design of Experiments (DoE) approach, with the addition of some utility function to perform some statistical analyses.
 Depends: 
     R (>= 4.0.0)
 License: CC BY 4.0
@@ -26,12 +26,12 @@ Imports:
     stringr,
     tibble,
     tidyr,
-    tidyverse,
     utils
 LazyData: true
 Suggests: 
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tidyverse
 VignetteBuilder: knitr
 Config/testthat/edition: 3

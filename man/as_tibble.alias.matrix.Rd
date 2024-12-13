@@ -4,25 +4,12 @@
 \alias{as_tibble.alias.matrix}
 \title{Convert an alias matrix to a tibble}
 \usage{
-\method{as_tibble}{alias.matrix}(
-  am,
-  ...,
-  .rows = NULL,
-  .name_repair = "check_unique",
-  rownames = NULL,
-  compact = TRUE
-)
+\method{as_tibble}{alias.matrix}(x, ..., compact = TRUE)
 }
 \arguments{
-\item{am}{the alias matrix object}
+\item{x}{the alias matrix object}
 
 \item{...}{additional arguments to \code{as_tibble}}
-
-\item{.rows}{The number of rows, useful to create a 0-column tibble or just as an additional check (see \code{\link[tibble:as_tibble]{tibble::as_tibble()}})}
-
-\item{.name_repair}{Treatment of problematic column names (see \code{\link[tibble:as_tibble]{tibble::as_tibble()}})}
-
-\item{rownames}{How to treat existing row names of a data frame or matrix (see \code{\link[tibble:as_tibble]{tibble::as_tibble()}}}
 
 \item{compact}{a logical: if TRUE, it reports all possible effects
 combinations, even those with no alias.}

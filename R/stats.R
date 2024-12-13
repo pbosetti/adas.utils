@@ -7,11 +7,11 @@
 #' @param threshold the threshold for the frequency of the suspect outlier
 #'
 #' @return a list with the following components:
-#' \itemize{
-#'  \item{s0}{the maximum difference}
-#'  \item{index}{the index of the suspect outlier}
-#'  \item{value}{the value of the suspect outlier}
-#'  \item{reject}{a logical value indicating whether the suspect outlier should be rejected}
+#' \describe{
+#'  \item{`s0`}{the maximum difference}
+#'  \item{`index`}{the index of the suspect outlier}
+#'  \item{`value`}{the value of the suspect outlier}
+#'  \item{`reject`}{a logical value indicating whether the suspect outlier should be rejected}
 #' }
 #' @export
 #'
@@ -54,6 +54,7 @@ chauvenet <- function(x, threshold=0.5) {
 #' @examples
 #' daniel_plot_qq(lm(Y~A*B*C*D, data=filtration))
 daniel_plot_qq <- function(model, alpha=0.5, xlim=c(-3,3)) {
+  value <- term <- NULL
   e <- effects(model)
   tibble(
     term = names(e),
@@ -85,6 +86,7 @@ daniel_plot_qq <- function(model, alpha=0.5, xlim=c(-3,3)) {
 #' @examples
 #' daniel_plot_hn(lm(Y~A*B*C*D, data=filtration))
 daniel_plot_hn <- function(model, ...) {
+  . <- NULL
   effects(model) %>%
     tail(-1) %>%
     gghalfnorm(labs=names(.),...) +
@@ -102,11 +104,11 @@ daniel_plot_hn <- function(model, ...) {
 #' @return a Pareto chart of the effects of the model
 #' @export
 #'
-#' @seealso [pareto_chart.default()] [pareto_chart.lm()]
+#' @seealso [pareto_chart.data.frame()] [pareto_chart.lm()]
 #'
 #' @examples
 #' # For a data frame:
-#' library(tidyverse)
+#' library(tibble)
 #' set.seed(1)
 #' tibble(
 #'   val=rnorm(10, sd=5),
@@ -125,9 +127,10 @@ pareto_chart <- function(obj, ...) {
 #'
 #' Create a Pareto chart for a data frame.
 #'
-#' @param data a data frame
+#' @param obj a data frame
 #' @param labels the column with the labels of the data frame
 #' @param values the column with the values of the data frame
+#' @param ... further parameters (currently unused)
 #'
 #' @return a Pareto chart of the data frame
 #' @export
@@ -135,16 +138,17 @@ pareto_chart <- function(obj, ...) {
 #' data frame, their sign, and the cumulative value.
 #'
 #' @examples
-#' library(tidyverse)
+#' library(tibble)
 #' set.seed(1)
 #' tibble(
 #'   val=rnorm(10, sd=5),
 #'   cat=LETTERS[1:length(val)]
 #'   ) %>%
 #'   pareto_chart(labels=cat, values=val)
-pareto_chart.default <- function(data, labels, values) {
-  stopifnot(is.data.frame(data))
-  df <- data %>%
+pareto_chart.data.frame <- function(obj, labels, values, ...) {
+  cum <- effect <- NULL
+  stopifnot(is.data.frame(obj))
+  df <- obj %>%
     mutate(
       sign=ifelse({{values}}<0, "negative", "positive"),
       effect = abs({{values}}),
@@ -173,7 +177,8 @@ pareto_chart.default <- function(data, labels, values) {
 #'
 #' Creates a Pareto chart for the effects of a linear model.
 #'
-#' @param model a linear model
+#' @param obj a linear model
+#' @param ... further parameters (currently unused)
 #'
 #' @return a Pareto chart of the effects of the model
 #' @export
@@ -182,14 +187,15 @@ pareto_chart.default <- function(data, labels, values) {
 #'
 #' @examples
 #' pareto_chart(lm(Y~A*B*C*D, data=filtration))
-pareto_chart.lm <- function(model) {
+pareto_chart.lm <- function(obj, ...) {
+  effect <- NULL
   tibble(
-    effect = 2*coef(model),
+    effect = 2*coef(obj),
     factor=names(effect)
   ) %>%
     na.omit() %>%
     filter(factor != "(Intercept)") %>%
-    pareto_chart(labels=factor, values=effect)
+    pareto_chart(labels=factor, values=effect, ...)
 }
 
 
@@ -204,7 +210,7 @@ pareto_chart.lm <- function(model) {
 #' @export
 #'
 #' @examples
-#' library(tidyverse)
+#' library(tibble)
 #' df <- tibble(
 #'   xn = rnorm(100, mean=20, sd=5),
 #'   xu = runif(100, min=0, max=40)

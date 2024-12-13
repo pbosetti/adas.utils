@@ -19,7 +19,7 @@ This is a generic function for Pareto's chart.
 }
 \examples{
 # For a data frame:
-library(tidyverse)
+library(tibble)
 set.seed(1)
 tibble(
   val=rnorm(10, sd=5),
@@ -31,5 +31,5 @@ tibble(
 pareto_chart(lm(Y~A*B*C*D, data=filtration))
 }
 \seealso{
-\code{\link[=pareto_chart.default]{pareto_chart.default()}} \code{\link[=pareto_chart.lm]{pareto_chart.lm()}}
+\code{\link[=pareto_chart.data.frame]{pareto_chart.data.frame()}} \code{\link[=pareto_chart.lm]{pareto_chart.lm()}}
 }

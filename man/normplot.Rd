@@ -22,7 +22,7 @@ a normal probability plot (ggplot2)
 Normal probability plot
 }
 \examples{
-library(tidyverse)
+library(tibble)
 df <- tibble(
   xn = rnorm(100, mean=20, sd=5),
   xu = runif(100, min=0, max=40)

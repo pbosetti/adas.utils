@@ -4,10 +4,10 @@
 \alias{plot.alias.matrix}
 \title{Plot the alias matrix}
 \usage{
-\method{plot}{alias.matrix}(am, ..., compact = TRUE)
+\method{plot}{alias.matrix}(x, ..., compact = TRUE)
 }
 \arguments{
-\item{am}{an alias matrix}
+\item{x}{an alias matrix}
 
 \item{...}{additional arguments to \code{\link[ggplot2:geom_tile]{ggplot2::geom_tile()}}}
 

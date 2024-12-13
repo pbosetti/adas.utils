@@ -13,11 +13,11 @@ chauvenet(x, threshold = 0.5)
 }
 \value{
 a list with the following components:
-\itemize{
-\item{s0}{the maximum difference}
-\item{index}{the index of the suspect outlier}
-\item{value}{the value of the suspect outlier}
-\item{reject}{a logical value indicating whether the suspect outlier should be rejected}
+\describe{
+\item{\code{s0}}{the maximum difference}
+\item{\code{index}}{the index of the suspect outlier}
+\item{\code{value}}{the value of the suspect outlier}
+\item{\code{reject}}{a logical value indicating whether the suspect outlier should be rejected}
 }
 }
 \description{

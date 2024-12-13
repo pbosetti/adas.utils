@@ -1,0 +1,293 @@
+---
+title: "Development"
+output: html_notebook
+---
+
+```{r setup}
+library(devtools)
+library(usethis)
+library(tidyverse)
+```
+
+# Imported functions
+
+```{r include=FALSE}
+use_import_from(
+  "glue", 
+  "glue"
+)
+
+use_import_from(
+  "readr", c("read_csv", "read_csv2", "write_csv", "write_csv2")
+)
+
+use_import_from(
+  "tibble", 
+  c("tibble", "as_tibble")
+)
+
+use_import_from("gghalfnorm", "gghalfnorm")
+
+use_import_from("lubridate", "stamp")
+
+use_import_from(
+  "tidyr",
+  "pivot_longer"
+)
+
+use_import_from(
+  "grDevices", c("grey")
+)
+
+use_import_from(
+  "stats", 
+  c("as.formula", "coef", "ecdf", "effects", "na.omit",
+               "pnorm", "sd", "setNames", "terms")
+)
+
+use_import_from(
+  "utils", c("tail")
+)
+
+use_import_from(
+  "dplyr", 
+   c(
+     "across",
+     "add_row",
+     "arrange", 
+     "bind_rows",
+     "c_across",
+     "desc",
+     "filter",
+     "if_else",
+     "mutate", 
+     "n", 
+     "pull",
+     "relocate",
+     "rename_with",
+     "rowwise",
+     "select",
+     "slice_tail",
+     "summarize_all",
+     "ungroup"
+   )
+)
+
+use_import_from(
+  "purrr", 
+   c(
+     "accumulate",
+     "discard",
+     "keep",
+     "list_merge",
+     "map", 
+     "set_names",
+     "walk",
+     "iwalk"
+   )   
+)
+
+use_import_from(
+  "ggplot2", 
+  c(
+    "aes", 
+    "coord_cartesian",
+    "element_text",
+    "ggplot",
+    "geom_col",
+    "geom_function",
+    "geom_hline",
+    "geom_label",
+    "geom_line",
+    "geom_point",
+    "geom_qq",
+    "geom_qq_line",
+    "geom_tile",
+    "labs",
+    "scale_fill_viridis_d",
+    "scale_y_continuous",
+    "sec_axis",
+    "stat_qq",
+    "theme"
+    
+  )
+)
+
+use_import_from(
+  "rlang", 
+  c("is_formula","sym")
+)
+
+use_import_from(
+  "stringr",
+  "str_remove_all"
+)
+```
+# Build doc and install
+
+Run this to update documentation and install locally.
+
+
+```{r include=FALSE, eval=FALSE}
+devtools::document()
+devtools::build_vignettes()
+devtools::install()
+```
+
+# Examples
+
+```{r}
+library(adas.utils)
+```
+
+
+```{r}
+fp_design_matrix(5) %>% 
+  fp_fraction(~A*B*C*D) %>% 
+  fp_fraction(~B*C*D*E) %>% 
+  dplyr::mutate(Y=rnorm(dplyr::n()))
+```
+
+```{r}
+fp_alias(~A*B*C*D)
+fp_alias(~B*C*D*E)
+```
+
+```{r}
+dm <- fp_design_matrix(3)
+
+fp_augment_center <- function(dm, rep=5) {
+  stopifnot("factorial.plan" %in% class(dm))
+  r <- nrow(dm)
+  fct <- attr(dm, "factors")
+  
+  dm %>% 
+    add_row(
+      StdOrder = (r+1):(r+rep),
+      RunOrder = sample((r+1):(r+rep)),
+      .treat = "0",
+      .rep = 1:rep,
+    ) %>% 
+    mutate(
+      across({fct}, ~ 0)
+    )
+}
+
+dm %>% 
+  fp_augment_center(5)
+```
+
+
+# Making data
+
+## $2^2$ CCD
+
+```{r}
+set.seed(0)
+
+f <- function(a, b) {
+  1 + 2*a + 3*a^2+ 3*b + 0.05*b^2 + 4*a*b + rnorm(length(a))
+}
+
+dm <- fp_design_matrix(2, rep=3) %>% 
+  fp_augment_center(rep=4) %>%
+  fp_augment_axial(rep=2) %>%
+  mutate(
+    Y = f(A, B)
+  )
+
+dm
+```
+
+
+```{r}
+dm %>% 
+  filter(.treat != "center" & .treat != "axial") %>% 
+  lm(Y ~ A*B, data=.) %>%
+  anova()
+```
+
+```{r}
+dm %>% 
+  filter(.treat != "axial") %>% 
+  lm(Y ~ A*I(A^2)*B, data=.) %>%
+  anova()
+```
+
+
+
+```{r}
+dm %>% 
+  lm(Y ~ A*I(A^2)*B*I(B^2)+A:B, data=.) %>%
+  anova()
+```
+
+```{r}
+dm %>% 
+  lm(Y ~  A * B * I(A^2) * I(B^2), data=.) %>%
+  anova()
+```
+
+
+```{r}
+ccd_experiment_yield <- list(
+  base = dm %>% 
+    filter(.treat != "center" & .treat != "axial") %>% 
+    pull(Y),
+  center = dm %>% 
+    filter(.treat == "center") %>% 
+    pull(Y),
+  axial = dm %>%
+    filter(.treat == "axial") %>% 
+    pull(Y)
+)
+```
+
+
+
+
+```{r}
+dm <- fp_design_matrix(3, rep=2)
+
+# fp_add_scale <- function(dm, ..., suffix="_s") {
+#   attr(dm, "scales") <- list()
+#   for (i in 1:...length()) {
+#     name <- ...names()[i]
+#     rng <- ...elt(i)
+#     if (!(is.numeric(rng) & length(rng) == 2 & is.numeric(dm[[name]]))) {
+#       warning("Skipping factor ", name, " (it is not a number, or wrong scale range/type provided)\n")
+#       next
+#     }
+#     dm <- dm %>% 
+#       mutate(
+#         !!paste0(name, suffix) := scales::rescale(!!sym(name), to=rng)
+#       )
+#     attr(dm, "scales") <- append(attr(dm, "scales"), setNames(list(rng), name))
+#   }
+#   return(dm)
+# }
+
+dms <-  dm %>% 
+  fp_add_scale(A=c(2, 12), B=c(40, 60), suffix="")
+
+dms
+```
+
+```{r}
+fp_design_matrix(2) %>% 
+  fp_add_names(A="Temperature", B="Pressure") 
+```
+
+```{r}
+dm <- fp_design_matrix(2) %>% 
+  fp_add_names(A="Temperature", B="Pressure") %>% 
+  fp_add_scale(A=c(2, 12), B=c(40, 60), suffix="_s") %>%
+  fp_write_csv("design_matrix.csv")
+```
+
+
+```{r}
+dm %>%
+  fp_read_csv("design_matrix.csv")
+```
+

@@ -4,10 +4,12 @@
 \alias{pareto_chart.lm}
 \title{Pareto's chart}
 \usage{
-\method{pareto_chart}{lm}(model)
+\method{pareto_chart}{lm}(obj, ...)
 }
 \arguments{
-\item{model}{a linear model}
+\item{obj}{a linear model}
+
+\item{...}{further parameters (currently unused)}
 }
 \value{
 a Pareto chart of the effects of the model

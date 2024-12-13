@@ -8,7 +8,6 @@
 #' number, an error is thrown.
 #'
 #' @return A formula
-#' @export
 #' @noRd
 #'
 #' @examples
@@ -77,6 +76,7 @@ fp_treatments <- function(arg) {
 #' @examples
 #' fp_design_matrix(3, rep=2, levels=c("-", "+"))
 fp_design_matrix <- function(arg, rep = 1, levels = c(-1,1)) {
+  . <- RunOrder <- any_of <- .rep <- NULL
   if (is_formula(arg))
     fct <- terms(arg) %>% attr("variables") %>% as.character() %>% tail(-1)
   else if (is.numeric(arg))
@@ -128,6 +128,7 @@ fp_design_matrix <- function(arg, rep = 1, levels = c(-1,1)) {
 #' fp_design_matrix(3, rep=2) %>%
 #'   fp_add_scale(A=c(10, 30), B=c(0, 1), suffix=".scaled")
 fp_add_scale <- function(dm, ..., suffix="_s") {
+  `:=` <- Y <- last_col <- NULL
   for (i in 1:...length()) {
     name <- ...names()[i]
     rng <- ...elt(i)
@@ -243,6 +244,7 @@ print.factorial.plan <- function(x, ...) {
 #' @export
 #'
 fp_write_csv <- function(dm, file, comment="# ", timestamp=TRUE, type=c(1,2), ...) {
+  RunOrder <- NULL
   sf <- lubridate::stamp("Created 20/01/2024 03:34:10", quiet=TRUE)
   fp_info(dm, file=file, comment=comment)
   if (timestamp)
@@ -279,6 +281,7 @@ fp_write_csv <- function(dm, file, comment="# ", timestamp=TRUE, type=c(1,2), ..
 #' @export
 #' @seealso [fp_write_csv()]
 fp_read_csv <- function(dm, file, type=c(1,2), yield="Y", comment="#") {
+  StdOrder <- NULL
   if (type[1] == 1) {
     n <- read_csv(file, col_names = TRUE, comment=comment, show_col_types = FALSE) %>%
       arrange(StdOrder)
@@ -316,6 +319,7 @@ fp_read_csv <- function(dm, file, type=c(1,2), yield="Y", comment="#") {
 #' @examples
 #' fp_effect_names(~A*B*C)
 fp_effect_names <- function(arg) {
+  . <- p <- w <- effect <- NULL
   formula <- fp_defrel(arg)
   terms(formula) %>%
     attr("factors") %>%
@@ -358,7 +362,6 @@ fp_effect_names <- function(arg) {
 #' @param B a string representing an effect (e.g. `"CD"`)
 #'
 #' @return A logical value
-#' @export
 #' @noRd
 #'
 #' @seealso [fp_defrel()] [fp_alias()] [fp_alias_list()] [fp_gen2alias()]
@@ -382,7 +385,6 @@ fp_has_alias <- function(arg, A, B) {
 #' @param arg A formula or a number of factors
 #'
 #' @return A matrix of logical values
-#' @export
 #' @noRd
 #' @examples
 #' fp_alias(~A*B*C*D)
@@ -416,6 +418,7 @@ fp_alias <- function(arg) {
 #' @examples
 #' fp_gen2alias("ABCD", "BD")
 fp_gen2alias <- function(generator, effect) {
+  . <- NULL
   paste0(generator, effect) %>%
     strsplit(split = "") %>%
     unlist() %>%
@@ -439,12 +442,12 @@ fp_gen2alias <- function(generator, effect) {
 #' @param arg A formula for the defining relationship, or the number of factors
 #'
 #' @return a list of aliases (as formulas)
-#' @export
 #' @noRd
 #'
 #' @examples
 #' fp_alias_list(~A*B*C*D)
 fp_alias_list <- function(arg) {
+  effect <- . <- NULL
   formula <- fp_defrel(arg)
   m <- fp_alias(formula) %>% as_tibble(rownames="effect")
   f <- m %>% pull(effect) %>% purrr::set_names()
@@ -476,6 +479,7 @@ fp_alias_list <- function(arg) {
 #'   fp_fraction(~A*B*C*D) %>%
 #'   fp_fraction(~B*C*D*E)
 fp_fraction <- function(dm, formula, remove=TRUE) {
+  `:=` <- NULL
   stopifnot(is_formula(formula))
   stopifnot("factorial.plan" %in% class(dm))
 
@@ -560,6 +564,7 @@ fp_augment_center <- function(dm, rep=5) {
 #'   fp_augment_center(rep=4) %>%
 #'   fp_augment_axial()
 fp_augment_axial <- function(dm, rep=1) {
+  . <- axial <- center <- StdOrder <- NULL
   n <- length(attr(dm, "factors"))
   dm <- dm %>%
     bind_rows(
@@ -601,6 +606,7 @@ fp_augment_axial <- function(dm, rep=1) {
 #' @examples
 #' fp_third_dr(~A*B*C, ~B*C*D)
 fp_third_dr <- function(f1, f2) {
+  . <- NULL
   f1_l <- terms(f1) %>% attr("term.labels") %>% keep(~ nchar(.) == 1)
   f2_l <- terms(f2) %>% attr("term.labels") %>% keep(~ nchar(.) == 1)
   f <- c(f1_l, f2_l) %>%
@@ -673,6 +679,7 @@ fp_all_drs <- function(...) {
 #' @examples
 #' fp_merge_drs(~A*B*C, ~B*C*D)
 fp_merge_drs <- function(f1, ...) {
+  . <- NULL
   f <- c(f1, ...) %>%
     map(~ terms(.) %>% attr("term.labels") %>% keep(~ nchar(.) == 1)) %>%
     unlist() %>%
@@ -717,6 +724,7 @@ formula2effect <- function(f) {
 #' @examples
 #' fp_alias_matrix(~A*B*C, ~B*C*D)
 fp_alias_matrix <- function(...) {
+  . <- NULL
   drs <- fp_all_drs(...)
   m <- drs %>%
     fp_merge_drs() %>%
@@ -743,11 +751,8 @@ fp_alias_matrix <- function(...) {
 #' (i.e. right-hand side) of the defining relationship that generates each
 #' alias.
 #'
-#' @param am the alias matrix object
+#' @param x the alias matrix object
 #' @param ... additional arguments to `as_tibble`
-#' @param .rows The number of rows, useful to create a 0-column tibble or just as an additional check (see [tibble::as_tibble()])
-#' @param .name_repair Treatment of problematic column names (see [tibble::as_tibble()])
-#' @param rownames How to treat existing row names of a data frame or matrix (see [tibble::as_tibble()]
 #' @param compact a logical: if TRUE, it reports all possible effects
 #'  combinations, even those with no alias.
 #'
@@ -756,13 +761,14 @@ fp_alias_matrix <- function(...) {
 #'
 #' @examples
 #' tibble::as_tibble(fp_alias_matrix(~A*B*C, ~B*C*D))
-as_tibble.alias.matrix <- function(am, ..., .rows = NULL, .name_repair = "check_unique", rownames = NULL, compact=TRUE) {
-  class(am) <- Filter(function(x) x!="alias.matrix", class(am))
-  drs <- attr(am, "defining.relationships")
+as_tibble.alias.matrix <- function(x, ..., compact=TRUE) {
+  Effect.x <- . <- generator <- NULL
+  class(x) <- Filter(function(x) x!="alias.matrix", class(x))
+  drs <- attr(x, "defining.relationships")
   drs_list <- drs %>%
     map(~ formula2effect(.)) %>%
     unlist()
-  as_tibble(am, ..., .rows = .rows, .name_repair = .name_repair, rownames="Effect.x") %>%
+  as_tibble(x, ..., rownames="Effect.x") %>%
     pivot_longer(-Effect.x, names_to="Effect.y", values_to="generator") %>% {
       if (compact)
         filter(., generator>0)
@@ -779,6 +785,7 @@ as_tibble.alias.matrix <- function(am, ..., .rows = NULL, .name_repair = "check_
 #' @noRd
 #'
 print.alias.matrix <- function(x, ...) {
+  . <- NULL
   class(x) <- Filter(function(x) x!="alias.matrix", class(x))
   attr(x, "defining.relationships") %>%
     map(~ formula2effect(.)) %>%
@@ -793,7 +800,7 @@ print.alias.matrix <- function(x, ...) {
 #'
 #' Produces a tile plot of the alias matrix.
 #'
-#' @param am an alias matrix
+#' @param x an alias matrix
 #' @param ... additional arguments to [ggplot2::geom_tile()]
 #' @param compact logical, if TRUE only positive aliases are shown, omitting
 #' empty rows and columns
@@ -804,11 +811,12 @@ print.alias.matrix <- function(x, ...) {
 #' @examples
 #' fp_alias_matrix(~A*B*C, ~B*C*D) %>%
 #'   plot()
-plot.alias.matrix <- function(am, ..., compact=TRUE) {
-  drs_list <- attr(am, "defining.relationships") %>%
+plot.alias.matrix <- function(x, ..., compact=TRUE) {
+  Effect.x <- Effect.y <- generator <- . <- NULL
+  drs_list <- attr(x, "defining.relationships") %>%
     map(~ paste0("I=",formula2effect(.))) %>%
     unlist()
-  am %>%
+  x %>%
     as_tibble() %>%
     ggplot(aes(x=Effect.x, y=Effect.y, fill=generator)) +
     geom_tile(color=grey(1/4), ...) +
