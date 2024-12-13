@@ -125,7 +125,7 @@ fp_design_matrix <- function(arg, rep = 1, levels = c(-1,1)) {
 #'
 #' @examples
 #' fp_design_matrix(3, rep=2) %>%
-#'   fp_add_scale(dm, A=c(10, 30), B=c(0, 1), suffix=".scaled")
+#'   fp_add_scale(A=c(10, 30), B=c(0, 1), suffix=".scaled")
 fp_add_scale <- function(dm, ..., suffix="_s") {
   for (i in 1:...length()) {
     name <- ...names()[i]
