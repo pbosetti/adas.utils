@@ -1,9 +1,9 @@
 Package: adas.utils
 Title: Utility functions for the ADAS course, University of Trento, Italy
-Version: 0.4.3
+Version: 1.0.0
 Authors@R: 
     person("Paolo", "Bosetti", , "paolo.bosetti@unitn.it", role = c("aut", "cre"))
-Description: Utility functions for the ADAS course, University of Trento, Italy. The package contains functions to deal with Design of Experiments (DoE) factoral plans, with the addition of some utility function to perform some statistical analyses.
+Description: Utility functions for the ADAS course, University of Trento, Italy. The package contains functions to deal with Design of Experiments (DoE) factorial plans, with the addition of some utility function to perform some statistical analyses.
 Depends: 
     R (>= 4.0.0)
 License: CC BY 4.0

@@ -9,7 +9,7 @@ daniel_plot_hn(model, ...)
 \arguments{
 \item{model}{a linear model}
 
-\item{...}{further argiuments to \code{\link[=gghalfnorm]{gghalfnorm()}}}
+\item{...}{further arguments to \code{\link[=gghalfnorm]{gghalfnorm()}}}
 }
 \value{
 a half-normal plot with the effects of the model

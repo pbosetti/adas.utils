@@ -112,7 +112,7 @@ fpc <- fp %>%
 fpc$Y[fpc$.treat == "center"] <- ccd_experiment_yield$center
 ```
 
-Now we can fit a model with the quadratic term, using either $A$ or $B$: since we only have a central point, we cannot discriminate which factor is contributing to the curvature in the response suface. We get:
+Now we can fit a model with the quadratic term, using either $A$ or $B$: since we only have a central point, we cannot discriminate which factor is contributing to the curvature in the response surface. We get:
 
 ```{r}
 fpc %>% 
@@ -243,7 +243,7 @@ df %>% normplot(xu)
 
 The Pareto chart is a bar chart that displays the relative importance of problems in a format that is very easy to interpret. The bars are sorted in descending order, and the cumulative percentage of the total is shown by the line.
 
-It can prove useful in the context of factorial plans, to identify the most important factors, or in sensityvity analysis, to identify the most important parameters.
+It can prove useful in the context of factorial plans, to identify the most important factors, or in sensitivity analysis, to identify the most important parameters.
 
 The package provides a *generic function*, `pareto_chart`, that can be used with a tibble (or a data frame), or with a linear model (an `lm` object). In the latter case, the function produces the Pareto chart of the model effects.
 

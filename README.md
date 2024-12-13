@@ -51,7 +51,7 @@ x[50] <- 10
 chauvenet(x)
 #> Chauvenet's criterion for sample x
 #> Suspect outlier: 50, value 10
-#> Expected frequency: 3.61458290394396e-11, threshold: 0.5
+#> Expected frequency: 5.61978810813674e-11, threshold: 0.5
 #> Decision: reject it
 ```
 
@@ -68,7 +68,7 @@ daniel_plot_qq(lm(Y~A*B*C*D, data=filtration))
 
 ### Pareto chart
 
-The `pareto_chart` function is a generic function taht creates a Pareto
+The `pareto_chart` function is a generic function that creates a Pareto
 chart either from a general data frame or from the effects of a `lm`
 object. Here is an example:
 
@@ -114,6 +114,13 @@ $2^{5-2}$ fractional factorial plan:
 fp_design_matrix(5) %>% 
   fp_fraction(~A*B*C*D) %>% 
   fp_fraction(~B*C*D*E)
+#>  Factorial Plan Design Matrix
+#>  Defining Relationship:  ~ A * B * C * D * E 
+#>  Factors:  A B C D E 
+#>  Levels:  -1 1 
+#>  Fraction:  I=ABCD I=BCDE 
+#>  Type:  plain 
+#>  
 #> # A tibble: 8 × 12
 #>   StdOrder RunOrder .treat  .rep     A     B     C     D     E Y      ABCD  BCDE
 #>      <int>    <int> <chr>  <int> <dbl> <dbl> <dbl> <dbl> <dbl> <lgl> <dbl> <dbl>
@@ -135,19 +142,26 @@ composite design with axial points:
 fp_design_matrix(3, rep=2) %>% 
   fp_augment_center(rep=5) %>% 
   fp_augment_axial(rep=2)
+#>  Factorial Plan Design Matrix
+#>  Defining Relationship:  ~ A * B * C 
+#>  Factors:  A B C 
+#>  Levels:  -1 1 
+#>  Fraction:  NA 
+#>  Type:  composite 
+#>  
 #> # A tibble: 45 × 8
 #>    StdOrder RunOrder .treat  .rep     A     B     C Y    
 #>       <int>    <int> <chr>  <int> <dbl> <dbl> <dbl> <lgl>
-#>  1        1       10 (1)        1     0     0     0 NA   
-#>  2        2        7 a          1     0     0     0 NA   
-#>  3        3        3 b          1     0     0     0 NA   
-#>  4        4       16 ab         1     0     0     0 NA   
-#>  5        5        6 c          1     0     0     0 NA   
-#>  6        6        8 ac         1     0     0     0 NA   
-#>  7        7        2 bc         1     0     0     0 NA   
-#>  8        8       13 abc        1     0     0     0 NA   
-#>  9        9       12 (1)        2     0     0     0 NA   
-#> 10       10       11 a          2     0     0     0 NA   
+#>  1        1       10 (1)        1    -1    -1    -1 NA   
+#>  2        2        7 a          1     1    -1    -1 NA   
+#>  3        3        3 b          1    -1     1    -1 NA   
+#>  4        4       16 ab         1     1     1    -1 NA   
+#>  5        5        6 c          1    -1    -1     1 NA   
+#>  6        6        8 ac         1     1    -1     1 NA   
+#>  7        7        2 bc         1    -1     1     1 NA   
+#>  8        8       13 abc        1     1     1     1 NA   
+#>  9        9       12 (1)        2    -1    -1    -1 NA   
+#> 10       10       11 a          2     1    -1    -1 NA   
 #> # ℹ 35 more rows
 ```
 

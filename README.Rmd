@@ -62,7 +62,7 @@ daniel_plot_qq(lm(Y~A*B*C*D, data=filtration))
 
 ### Pareto chart
 
-The `pareto_chart` function is a generic function taht creates a Pareto chart either from a general data frame or from the effects of a `lm` object. Here is an example:
+The `pareto_chart` function is a generic function that creates a Pareto chart either from a general data frame or from the effects of a `lm` object. Here is an example:
 
 ```{r}
 library(tidyverse)
