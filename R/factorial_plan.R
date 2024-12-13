@@ -92,9 +92,10 @@ fp_design_matrix <- function(arg, rep = 1, levels = c(-1,1)) {
     mutate(
       StdOrder = 1:n(),
       RunOrder = sample(n()),
-      .before = .data[[fct[1]]]
+      # .before = .data[[fct[1]]]
+      .before = any_of(fct[1])
     ) %>%
-    relocate(.rep, .before=.data[[fct[1]]]) %>%
+    relocate(.rep, .before=any_of(fct[1])) %>%
     mutate(Y=NA)
   if (length(levels) == 2) dm <- mutate(dm, .treat= rep(fp_treatments(arg), rep), .after=RunOrder)
   class(dm) <- c("factorial.plan", class(dm))
@@ -412,8 +413,6 @@ fp_alias <- function(arg) {
 #' @return An effect (string)
 #' @export
 #'
-#' @seealso [fp_defrel()]
-#'
 #' @examples
 #' fp_gen2alias("ABCD", "BD")
 fp_gen2alias <- function(generator, effect) {
@@ -442,7 +441,6 @@ fp_gen2alias <- function(generator, effect) {
 #' @return a list of aliases (as formulas)
 #' @export
 #' @noRd
-#' @seealso [fp_has_alias()] [fp_alias()]
 #'
 #' @examples
 #' fp_alias_list(~A*B*C*D)
@@ -747,6 +745,9 @@ fp_alias_matrix <- function(...) {
 #'
 #' @param am the alias matrix object
 #' @param ... additional arguments to `as_tibble`
+#' @param .rows The number of rows, useful to create a 0-column tibble or just as an additional check (see [tibble::as_tibble()])
+#' @param .name_repair Treatment of problematic column names (see [tibble::as_tibble()])
+#' @param rownames How to treat existing row names of a data frame or matrix (see [tibble::as_tibble()]
 #' @param compact a logical: if TRUE, it reports all possible effects
 #'  combinations, even those with no alias.
 #'
@@ -754,14 +755,14 @@ fp_alias_matrix <- function(...) {
 #' @export
 #'
 #' @examples
-#' as_tibble(fp_alias_matrix(~A*B*C, ~B*C*D))
-as_tibble.alias.matrix <- function(am, ..., compact=TRUE) {
+#' tibble::as_tibble(fp_alias_matrix(~A*B*C, ~B*C*D))
+as_tibble.alias.matrix <- function(am, ..., .rows = NULL, .name_repair = "check_unique", rownames = NULL, compact=TRUE) {
   class(am) <- Filter(function(x) x!="alias.matrix", class(am))
   drs <- attr(am, "defining.relationships")
   drs_list <- drs %>%
     map(~ formula2effect(.)) %>%
     unlist()
-  as_tibble(am, rownames="Effect.x") %>%
+  as_tibble(am, ..., .rows = .rows, .name_repair = .name_repair, rownames="Effect.x") %>%
     pivot_longer(-Effect.x, names_to="Effect.y", values_to="generator") %>% {
       if (compact)
         filter(., generator>0)
@@ -793,6 +794,7 @@ print.alias.matrix <- function(x, ...) {
 #' Produces a tile plot of the alias matrix.
 #'
 #' @param am an alias matrix
+#' @param ... additional arguments to [ggplot2::geom_tile()]
 #' @param compact logical, if TRUE only positive aliases are shown, omitting
 #' empty rows and columns
 #'
@@ -802,24 +804,14 @@ print.alias.matrix <- function(x, ...) {
 #' @examples
 #' fp_alias_matrix(~A*B*C, ~B*C*D) %>%
 #'   plot()
-plot.alias.matrix <- function(am, compact=TRUE) {
+plot.alias.matrix <- function(am, ..., compact=TRUE) {
   drs_list <- attr(am, "defining.relationships") %>%
     map(~ paste0("I=",formula2effect(.))) %>%
     unlist()
-  # am %>%
-  #   as_tibble(rownames="effect") %>%
-  #   pivot_longer(-effect) %>% {
-  #     if (compact)
-  #       filter(., value>0)
-  #     else .
-  #   } %>%
-  #   mutate(
-  #     Alias = ifelse(value>0, as.character(drs)[value], NA)
-  #   ) %>%
   am %>%
     as_tibble() %>%
     ggplot(aes(x=Effect.x, y=Effect.y, fill=generator)) +
-    geom_tile(color=grey(1/4)) +
+    geom_tile(color=grey(1/4), ...) +
     scale_fill_viridis_d() +
     labs(
       x = "Effect",

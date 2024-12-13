@@ -4,10 +4,12 @@
 \alias{plot.alias.matrix}
 \title{Plot the alias matrix}
 \usage{
-\method{plot}{alias.matrix}(am, compact = TRUE)
+\method{plot}{alias.matrix}(am, ..., compact = TRUE)
 }
 \arguments{
 \item{am}{an alias matrix}
+
+\item{...}{additional arguments to \code{\link[ggplot2:geom_tile]{ggplot2::geom_tile()}}}
 
 \item{compact}{logical, if TRUE only positive aliases are shown, omitting
 empty rows and columns}

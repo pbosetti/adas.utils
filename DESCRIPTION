@@ -3,7 +3,7 @@ Title: Utility functions for the ADAS course, University of Trento, Italy
 Version: 0.4.3
 Authors@R: 
     person("Paolo", "Bosetti", , "paolo.bosetti@unitn.it", role = c("aut", "cre"))
-Description: Utility functions for the ADAS course, University of Trento, Italy
+Description: Utility functions for the ADAS course, University of Trento, Italy. The package contains functions to deal with Design of Experiments (DoE) factoral plans, with the addition of some utility function to perform some statistical analyses.
 Depends: 
     R (>= 4.0.0)
 License: CC BY 4.0
@@ -15,17 +15,23 @@ Imports:
     gghalfnorm,
     ggplot2,
     glue,
+    grDevices,
     lubridate,
     magrittr,
     purrr,
     readr,
     rlang,
     scales,
+    stats,
     stringr,
     tibble,
-    tidyr
+    tidyr,
+    tidyverse,
+    utils
 LazyData: true
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
+Config/testthat/edition: 3

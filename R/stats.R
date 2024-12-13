@@ -12,7 +12,7 @@
 #'  \item{index}{the index of the suspect outlier}
 #'  \item{value}{the value of the suspect outlier}
 #'  \item{reject}{a logical value indicating whether the suspect outlier should be rejected}
-#'  }
+#' }
 #' @export
 #'
 #' @examples
@@ -229,41 +229,3 @@ normplot <- function(data, var, breaks=seq(0.1, 0.9, 0.1), linecolor="red") {
 }
 
 
-#' Generate the design matrix for a factorial experiment
-#'
-#' The function produces a design matrix for a factorial experiment. The
-#' function takes the number of factors, the number of replications, and the
-#' levels of the factors as arguments. The function returns a tibble with the
-#' design matrix. The design matrix also has the `StdOrder` and `RunOrder`
-#' columns, which are the standard order and the random order of the runs,
-#' respectively. Also, a NA column `Y` is added for the response variable.
-#'
-#' @param n_factors the number of factors (a scalar)
-#' @param rep the number of replications (a scalar)
-#' @param levels the levels of the factors (a vector)
-#'
-#' @return a design matrix (as a tibble). The design matrix also has the
-#' `StdOrder` and `RunOrder` columns, which are the standard order and the
-#' random order of the runs, respectively. Also, a NA column `Y` is added for
-#' the response variable.
-#'
-#' @export
-#'
-#' @examples
-#' # A 3^3 factorial plan, teplicated 2 times:
-#' design_matrix(3, rep=2, levels=-1:1)
-design_matrix <- function(n_factors, rep = 1, levels = c(-1,1)) {
-  warning("This function is deprecated in favor of `fp_design_matrix`")
-  LETTERS[1:n_factors] %>%
-    purrr::set_names(.) %>%
-    map(~ levels) %>%
-    list_merge(rep=1:rep) %>%
-    do.call(what=expand.grid, args=.) %>%
-    mutate(
-      StdOrder = 1:n(),
-      RunOrder = sample(n()),
-      .before = A
-    ) %>%
-    relocate(rep, .before=A) %>%
-    mutate(Y=NA)
-}

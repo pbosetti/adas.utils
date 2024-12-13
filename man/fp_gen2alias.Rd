@@ -23,6 +23,3 @@ Generators and aliases are strings of capital letters.
 \examples{
 fp_gen2alias("ABCD", "BD")
 }
-\seealso{
-\code{\link[=fp_defrel]{fp_defrel()}}
-}
