@@ -7,7 +7,9 @@
 fp_design_matrix(arg, rep = 1, levels = c(-1, 1))
 }
 \arguments{
-\item{arg}{Either a formula or a number of factors}
+\item{arg}{Either a formula or a number of factors. If it is a formula, the
+factors are extracted from it. If it is a number, the factors are the first
+\code{n} capital letters.}
 
 \item{rep}{Number of replications}
 
@@ -17,7 +19,11 @@ fp_design_matrix(arg, rep = 1, levels = c(-1, 1))
 A design matrix: a subclass of a tibble of class \code{factorial.plan}
 }
 \description{
-Factorial Plan Design Matrix
+Builds a design matrix from a one side formula or a number of factors.
+}
+\details{
+Defining relationships are represented as one side formulas, e.g. $I=ABC$
+becomes \code{~A*B*C}.
 }
 \examples{
 fp_design_matrix(3, rep=2, levels=c("-", "+"))

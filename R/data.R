@@ -12,3 +12,17 @@
 #'
 #'
 "filtration"
+
+
+#' Central Composite Design Experiment Yields
+#'
+#' Yield data for a two factor CCD experiment
+#'
+#' @format A list with three vectors:
+#' * `base`: the yield for a 2^2 factorial design, replicated 3 times
+#' * `center`: the yield for the center points, replicated 4 times
+#' * `axial`: the yield for the axial points, replicated 2 times
+#'
+#'
+#'
+"ccd_experiment_yield"

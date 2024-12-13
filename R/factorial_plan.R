@@ -1,6 +1,7 @@
+
 #' Factorial Plan Defining Relationship
 #'
-#'  Builds a formula from a number of factors
+#' Builds a formula from a number of factors
 #'
 #' @param arg If it is a formula, it is returned verbatim. If it is a number, a
 #' formula is built with the number of factors. If it is neither a formula nor a
@@ -8,6 +9,7 @@
 #'
 #' @return A formula
 #' @export
+#' @noRd
 #'
 #' @examples
 #' # Defining relationships with three factors
@@ -22,6 +24,7 @@ fp_defrel <- function(arg) {
     formula <- arg
   else
     stop("Argument must be either a formula or the number of factors")
+  attr(formula, ".Environment") <- .GlobalEnv
   return(formula)
 }
 
@@ -29,9 +32,14 @@ fp_defrel <- function(arg) {
 
 #' Factorial Plan List of Treatments
 #'
-#'  Builds a list of treatments from a formula, or from a number of factors.
+#' Builds a list of treatments from a formula, or from a number of factors.
 #'
-#' @param arg Either a formula or a number of factors
+#' Defining relationships are represented as one side formulas, e.g. $I=ABC$
+#' becomes `~A*B*C`.
+#'
+#' @param arg Either a formula or a number of factors. If it is a formula, the
+#'   factors are extracted from it. If it is a number, the factors are the first
+#'   `n` capital letters.
 #'
 #' @return A list of treatments
 #' @export
@@ -52,7 +60,14 @@ fp_treatments <- function(arg) {
 
 #' Factorial Plan Design Matrix
 #'
-#' @param arg Either a formula or a number of factors
+#' Builds a design matrix from a one side formula or a number of factors.
+#'
+#' Defining relationships are represented as one side formulas, e.g. $I=ABC$
+#' becomes `~A*B*C`.
+#'
+#' @param arg Either a formula or a number of factors. If it is a formula, the
+#'   factors are extracted from it. If it is a number, the factors are the first
+#'   `n` capital letters.
 #' @param rep Number of replications
 #' @param levels Levels of the factors
 #'
@@ -87,12 +102,77 @@ fp_design_matrix <- function(arg, rep = 1, levels = c(-1,1)) {
   attr(dm, "factors") <- fct
   attr(dm, "fraction") <- NA
   attr(dm, "levels") <- levels
+  attr(dm, "type") <- "plain"
+  attr(dm, "scales") <- list()
   return(dm)
 }
 
+
+#' Scale factors levels
+#'
+#' This function allows to add columns to a design matrix with scaled factor,
+#' i.e. factors reported in real units rather in coded units (e.g. -1, 1).
+#'
+#' @param dm the design matrix to scale
+#' @param ... a set of factors to scale, with their respective ranges, e.g.
+#' `A=c(10, 30), B=c(0, 1)`.if the range is not a two-number vector or the
+#' factor is not numeric, a warning is printed and the factor is skipped
+#' @param suffix the suffix to add to the scaled factor name in creating new
+#' columns. If the suffix is the empty string, factors are replaced.
+#'
+#' @return the design matrix with the scaled factors
+#' @export
+#'
+#' @examples
+#' fp_design_matrix(3, rep=2) %>%
+#'   fp_add_scale(dm, A=c(10, 30), B=c(0, 1), suffix=".scaled")
+fp_add_scale <- function(dm, ..., suffix="_s") {
+  for (i in 1:...length()) {
+    name <- ...names()[i]
+    rng <- ...elt(i)
+    if (!(is.numeric(rng) & length(rng) == 2 & is.numeric(dm[[name]]))) {
+      warning("Skipping factor ", name, " (it is not a number, or wrong scale range/type provided)\n")
+      next
+    }
+    dm <- dm %>%
+      mutate(
+        !!paste0(name, suffix) := scales::rescale(!!sym(name), to=rng)
+      )
+    attr(dm, "scales") <- append(attr(dm, "scales"), setNames(list(rng), name))
+  }
+  return(dm)
+}
+
+
+#' Print a factorial plan design matrix
+#'
+#' @param x the matrix
+#' @param ... other parameters passed to print()
+#'
+#' @export
+#' @noRd
+print.factorial.plan <- function(x, ...) {
+  class(x) <- Filter(function(x) x!="factorial.plan", class(x))
+  cat("Factorial Plan Design Matrix\n")
+  cat("Defining Relationship: ", as.character(attr(x, "def.rel")), "\n")
+  cat("Factors: ", attr(x, "factors"), "\n")
+  cat("Levels: ", attr(x, "levels"), "\n")
+  cat("Fraction: ", attr(x, "fraction"), "\n")
+  cat("Type: ", attr(x, "type"), "\n")
+  if (attr(x, "scales") %>% length() > 0) {
+    cat("Scaled factors:\n")
+    iwalk(attr(x, "scales"), ~ glue::glue("  {.y}: [{.x[1]}, {.x[2]}]") %>% cat(sep="\n"))
+  }
+  print(x, ...)
+}
+
+
 #' Factorial Plan effect names from a formula
 #'
-#'  Returns the effect names from a formula, according to Yate's convention.
+#' Returns the effect names from a formula, according to Yates' convention.
+#'
+#' Defining relationships are represented as one side formulas, e.g. $I=ABC$
+#' becomes `~A*B*C`.
 #'
 #' @param arg A formula
 #'
@@ -134,7 +214,10 @@ fp_effect_names <- function(arg) {
 #' Check for Factor Aliases
 #'
 #'  Checks if two factors are aliased in a formula. This function is
-#'  moslty used internally to build the alias matrix.
+#'  mostly used internally to build the alias matrix.
+#'
+#' Defining relationships are represented as one side formulas, e.g. $I=ABC$
+#' becomes `~A*B*C`.
 #'
 #' @param arg A formula for the defining relationship
 #' @param A a string representing an effect (e.g. `"AB"`)
@@ -142,9 +225,9 @@ fp_effect_names <- function(arg) {
 #'
 #' @return A logical value
 #' @export
+#' @noRd
 #'
-#'@seealso [fp_defrel()] [fp_alias()] [fp_alias_list()]
-#'
+#' @seealso [fp_defrel()] [fp_alias()] [fp_alias_list()] [fp_gen2alias()]
 #' @examples
 #' fp_has_alias(~A*B*C*D, "AB", "CD")
 fp_has_alias <- function(arg, A, B) {
@@ -154,20 +237,22 @@ fp_has_alias <- function(arg, A, B) {
   all(xor(m[A], m[B]))
 }
 
-
-#' Tabulate all the Aliases from a Defining Relationship
+#' Build an alias table from a formula
 #'
-#'  Tabulates all the aliases from a defining relationship.
+#' Given a Defining relationship or a number of factors, this function builds
+#' a matrix of aliases.
 #'
-#' @param arg A formula for the defining relationship
+#' Defining relationships are represented as one side formulas, e.g. $I=ABC$
+#' becomes `~A*B*C`.
 #'
-#' @return A matrix of aliases
+#' @param arg A formula or a number of factors
+#'
+#' @return A matrix of logical values
 #' @export
-#'
-#' @seealso [fp_defrel()]
-#'
+#' @noRd
 #' @examples
 #' fp_alias(~A*B*C*D)
+#' fp_alias(3)
 fp_alias <- function(arg) {
   formula <- fp_defrel(arg)
   nm <- fp_effect_names(formula)
@@ -182,18 +267,48 @@ fp_alias <- function(arg) {
   return(m)
 }
 
+#' Given a generator, find the alias
+#'
+#' Given a generator and an effect, this function returns the alias.
+#'
+#' Generators and aliases are strings of capital letters.
+#'
+#' @param generator a generator, in the form of `ABCD...`
+#' @param effect an effect, in the form of `BD...`
+#'
+#' @return An effect (string)
+#' @export
+#'
+#' @seealso [fp_defrel()]
+#'
+#' @examples
+#' fp_gen2alias("ABCD", "BD")
+fp_gen2alias <- function(generator, effect) {
+  paste0(generator, effect) %>%
+    strsplit(split = "") %>%
+    unlist() %>%
+    table() %>%
+    `[`(.==1) %>%
+    names() %>%
+    sort() %>%
+    paste0(collapse="")
+}
+
 
 
 #' List All Alias for a Fractional Factorial Plan
 #'
-#' Given a defining relationship, this function lists all the aliases for a
-#' fractional factorial plan.
+#' Given a defining relationship, as a one side firmula,, this function lists
+#' all the aliases for a fractional factorial plan.
+#'
+#' Defining relationships are represented as one side formulas, e.g. $I=ABC$
+#' becomes `~A*B*C`.
 #'
 #' @param arg A formula for the defining relationship, or the number of factors
 #'
-#' @return a list of aliases
+#' @return a list of aliases (as formulas)
 #' @export
-#'
+#' @noRd
 #' @seealso [fp_has_alias()] [fp_alias()]
 #'
 #' @examples
@@ -213,7 +328,10 @@ fp_alias_list <- function(arg) {
 #'
 #' @param dm A factorial plan table
 #' @param formula A formula for the defining relationship
-#' @param remove A logical value indicating if the removed columns should be removed
+#' @param remove A logical value indicating if the removed columns should be
+#'  removed. This setting is sticky: if it is FALSE and  you pipe the result of
+#'  this function to another `fp_fraction()` call, the columns will be
+#'  kept by default.
 #'
 #' @return A reduced factorial plan table
 #' @export
@@ -249,9 +367,9 @@ fp_fraction <- function(dm, formula, remove=TRUE) {
       !!i := eval(e)
     )
   if (is.na(attr(dm, "fraction")))
-    attr(dm, "fraction") <- i
+    attr(dm, "fraction") <- paste0("I=", i)
   else
-    attr(dm, "fraction") <- c(attr(dm, "fraction"), i)
+    attr(dm, "fraction") <- c(attr(dm, "fraction"), paste0("I=", i))
 
   attr(dm, "removed") <- remove
 
@@ -285,11 +403,11 @@ fp_augment_center <- function(dm, rep=5) {
     add_row(
       StdOrder = (r+1):(r+rep),
       RunOrder = sample((r+1):(r+rep)),
-      .treat = "0",
+      .treat = "center",
       .rep = 1:rep,
     ) %>%
     mutate(
-      across({fct}, ~ 0)
+      across({fct}, ~ if_else(.treat=="center", 0, .))
     )
   attr(dm, "type") <- "centered"
   return(dm)
@@ -331,4 +449,251 @@ fp_augment_axial <- function(dm, rep=1) {
     )
   attr(dm, "type") <- "composite"
   return(dm)
+}
+
+
+
+#' Build a third defining relationship
+#'
+#' Given two defining relationships, it builds the third, dependent one.
+#' For example, given $I=ABCD$ and $I=BCDE$, it will return $I=AE$, i.e.
+#' the result of $ABCD * BCDE = AE$, since $A * A = I$
+#'
+#' Defining relationships are represented as one side formulas, e.g. $I=ABC$
+#' becomes `~A*B*C`.
+#'
+#' @param f1 a one side formula
+#' @param f2 a one side formula
+#'
+#' @return a formula
+#' @noRd
+#' @examples
+#' fp_third_dr(~A*B*C, ~B*C*D)
+fp_third_dr <- function(f1, f2) {
+  f1_l <- terms(f1) %>% attr("term.labels") %>% keep(~ nchar(.) == 1)
+  f2_l <- terms(f2) %>% attr("term.labels") %>% keep(~ nchar(.) == 1)
+  f <- c(f1_l, f2_l) %>%
+    unique() %>%
+    discard(~ (. %in% f1_l) & (. %in% f2_l)) %>%
+    sort() %>%
+    paste0(collapse="*") %>% {
+      as.formula(paste0("~",.))
+    }
+  attr(f, ".Environment") <- .GlobalEnv
+  return(f)
+}
+
+#' Return a list of all defining relationships
+#'
+#' Given two or more independent refining relationships, represented as one
+#' side formulas,, this function returns a list of all possible defining
+#' relationships, including the dependent ones.
+#'
+#' Defining relationships are represented as one side formulas, e.g. $I=ABC$
+#' becomes `~A*B*C`.
+#'
+#' @param ... formulas, or a single list of formulas
+#'
+#' @return a list of formulas
+#' @export
+#'
+#' @examples
+#' fp_all_drs(~A*B*C, ~B*C*D)
+fp_all_drs <- function(...) {
+  if (is.list(..1)) l <- ..1
+  else l <- list(...)
+  if (length(l) == 1) return(list(l[[1]]))
+  n <- length(l)
+  m <- (1:(2^n-1)) %>%
+    accumulate(~ {
+      a <- ceiling(log2(.y))
+      x <- 2^floor(log2(.y))
+      if (.y %% x == 0) return(a+1)
+      else return(c(x, .y %% x))
+    })
+  for (i in seq_along(m)) {
+    el <- m[[i]]
+    if (length(el) == 2) {
+      x <- el[[1]]
+      y <- el[[2]]
+      m[[i]] <- fp_third_dr(m[[x]], m[[y]])
+    } else {
+      m[[i]] <- l[[el]]
+    }
+  }
+  return(m)
+}
+
+
+#' Return a merged defining relationship
+#'
+#' This function, given one or more independent refining relationships, returns
+#' the most complete relationship, i.e. that which includes all the factors.
+#'
+#' Defining relationships are represented as one side formulas, e.g. $I=ABC$
+#' becomes `~A*B*C`.
+#'
+#' @param f1 a formula
+#' @param ... other formulas
+#'
+#' @return a formula
+#' @export
+#'
+#' @examples
+#' fp_merge_drs(~A*B*C, ~B*C*D)
+fp_merge_drs <- function(f1, ...) {
+  f <- c(f1, ...) %>%
+    map(~ terms(.) %>% attr("term.labels") %>% keep(~ nchar(.) == 1)) %>%
+    unlist() %>%
+    unique() %>%
+    sort() %>%
+    paste0(collapse="*") %>% {
+      as.formula(paste0("~",.))
+    }
+  attr(f, ".Environment") <- .GlobalEnv
+  return(f)
+}
+
+
+
+#' Transforms a formula into a list of effects
+#'
+#' @param f a one-side formula
+#'
+#' @return a string representation of the generator
+#' @noRd
+#' @examples
+#' formula2effect(~A*B*C)
+formula2effect <- function(f) {
+  f %>%
+    as.character() %>%
+    tail(-1) %>%
+    str_remove_all("[*\\s]")
+}
+
+
+
+#' Build the alias matrix
+#'
+#' Given a list of formulas (defining relationships), this function returns
+#' a matrix of all possible aliases.
+#'
+#' @param ... one or more formulas, or a single list of formulas
+#'
+#' @return a square matrix
+#' @export
+#'
+#' @examples
+#' fp_alias_matrix(~A*B*C, ~B*C*D)
+fp_alias_matrix <- function(...) {
+  drs <- fp_all_drs(...)
+  m <- drs %>%
+    fp_merge_drs() %>%
+    fp_alias_list() %>%
+    names() %>% {
+      matrix(0L, nrow=length(.), ncol=length(.), dimnames=list(., .))
+    }
+  for (rd_n in seq_along(drs)) {
+    rd <- formula2effect(drs[[rd_n]])
+    for (effect in rownames(m)) {
+      als <- fp_gen2alias(rd, effect)
+      if (nchar(als)> 0)  m[effect, als] <- rd_n
+    }
+  }
+  class(m) <- c("alias.matrix", class(m))
+  attr(m, "defining.relationships") <- drs
+  return(m)
+}
+
+#' Convert an alias matrix to a tibble
+#'
+#' Given an alias matrix, this function returns a tidy tibble of the
+#' alias structures, with the added `generator` column containing the generator
+#' (i.e. right-hand side) of the defining relationship that generates each
+#' alias.
+#'
+#' @param am the alias matrix object
+#' @param ... additional arguments to `as_tibble`
+#' @param compact a logical: if TRUE, it reports all possible effects
+#'  combinations, even those with no alias.
+#'
+#' @return a tibble
+#' @export
+#'
+#' @examples
+#' as_tibble(fp_alias_matrix(~A*B*C, ~B*C*D))
+as_tibble.alias.matrix <- function(am, ..., compact=TRUE) {
+  class(am) <- Filter(function(x) x!="alias.matrix", class(am))
+  drs <- attr(am, "defining.relationships")
+  drs_list <- drs %>%
+    map(~ formula2effect(.)) %>%
+    unlist()
+  as_tibble(am, rownames="Effect.x") %>%
+    pivot_longer(-Effect.x, names_to="Effect.y", values_to="generator") %>% {
+      if (compact)
+        filter(., generator>0)
+      else .
+    }  %>%
+    mutate(
+      generator = ifelse(generator>0, drs_list[generator], NA)
+    )
+}
+
+#' Print an alias matrix
+#'
+#' @export
+#' @noRd
+#'
+print.alias.matrix <- function(x, ...) {
+  class(x) <- Filter(function(x) x!="alias.matrix", class(x))
+  attr(x, "defining.relationships") %>%
+    map(~ formula2effect(.)) %>%
+    unlist() %>%
+    cat("Defining relationships:\n", ., "\n\n")
+  attr(x, "defining.relationships") <- NULL
+  print(x, ...)
+}
+
+#' Plot the alias matrix
+#'
+#' Produces a tile plot of the alias matrix.
+#'
+#' @param am an alias matrix
+#' @param compact logical, if TRUE only positive aliases are shown, omitting
+#' empty rows and columns
+#'
+#' @return a ggplot object
+#' @export
+#'
+#' @examples
+#' fp_alias_matrix(~A*B*C, ~B*C*D) %>%
+#'   plot()
+plot.alias.matrix <- function(am, compact=TRUE) {
+  drs_list <- attr(am, "defining.relationships") %>%
+    map(~ paste0("I=",formula2effect(.))) %>%
+    unlist()
+  # am %>%
+  #   as_tibble(rownames="effect") %>%
+  #   pivot_longer(-effect) %>% {
+  #     if (compact)
+  #       filter(., value>0)
+  #     else .
+  #   } %>%
+  #   mutate(
+  #     Alias = ifelse(value>0, as.character(drs)[value], NA)
+  #   ) %>%
+  am %>%
+    as_tibble() %>%
+    ggplot(aes(x=Effect.x, y=Effect.y, fill=generator)) +
+    geom_tile(color=grey(1/4)) +
+    scale_fill_viridis_d() +
+    labs(
+      x = "Effect",
+      y = "Effect",
+      fill = "Generator",
+      title = paste("Aliases for def. relationships:", paste(drs_list, collapse=", "))
+    ) +
+    theme(
+      axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)
+    )
 }

@@ -11,7 +11,10 @@ fp_fraction(dm, formula, remove = TRUE)
 
 \item{formula}{A formula for the defining relationship}
 
-\item{remove}{A logical value indicating if the removed columns should be removed}
+\item{remove}{A logical value indicating if the removed columns should be
+removed. This setting is sticky: if it is FALSE and  you pipe the result of
+this function to another \code{fp_fraction()} call, the columns will be
+kept by default.}
 }
 \value{
 A reduced factorial plan table

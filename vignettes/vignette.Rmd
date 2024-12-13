@@ -7,21 +7,21 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-```
-
-```{r setup}
 library(adas.utils)
 library(tidyverse)
 ```
 
+
 # Factorial plans
 
 The package provides tools for dealing with factorial plan according to the *Design of Experiments* (DoE) protocols. The functions for dealing with DoE have names starting with `fp_`. As much as possible, we are aiming at a tidyverse-like syntax, so that the functions can be used in a pipe.
+
+We are following conventions and techniques illustrated in the book *Design and Analysis of Experiments* by Douglas C. Montgomery.
 
 ## Full factorial plan
 
@@ -39,15 +39,26 @@ If you want different factor names, use a right-side-only formula combining all 
 fp_design_matrix(~Speed*Weight)
 ```
 
+**NOTE**, though, that using custom factor names is discouraged, and won't work as expected if you are using the functions for dealing with **fractional factorial plans**, especially for the analysis of alias structures among factors.
+
 The yield column `Y` must then be completed according to the randomized `RunOrder` column.
+
+It is possible to add custom scales to the factors:
+
+```{r}
+fp_design_matrix(2) %>% 
+  fp_add_scale(A=c(1, 10), B=c(75, 125), suffix=".scaled")
+```
+
 
 ## Custom levels
 
-If you want a $k^n$ factorial plan with custom levels, pass the `levels` argument. In this case, though, the `.treat` column with Yate's treatment codes would be `NA`:
+If you want a $k^n$ factorial plan with custom levels, pass the `levels` argument. In this case, though, the `.treat` column with Yates' treatment codes would be `NA`:
 
 ```{r}
 fp_design_matrix(2, levels=-1:1)
 ```
+
 
 ## Augment a plan
 
@@ -66,11 +77,79 @@ fp_design_matrix(3) %>%
   fp_augment_axial(rep=2)
 ```
 
+### Full example
+
+Let's see a full example using the `ccd_experiment_yield` dataset, which contains a list of the yield data for three sequential experiments in a central composite design.
+
+First, we design a $3\cdot 2^2$ factorial plan, with two factors and two levels each:
+
+
+```{r}
+fp <- fp_design_matrix(2, rep=3)
+```
+
+Ideally, we would then sort the table according to the `RunOrder` column, and complete the `Y` column with the yield data from the the real experiments. For the sake of documenting the package, we can directly add the yield data from the `base` field of the `ccd_experiment_yield` dataset (which holds values **in standard Yates' order**):
+
+
+```{r}
+fp$Y <- ccd_experiment_yield$base
+```
+
+Now we can fit a linear model to the data, and check the p-values of the ANOVA:
+
+```{r}
+fp %>% 
+  lm(Y ~ A*B, data=.) %>% 
+  anova()
+```
+All factors and their interactions are significant. But is the two-level model enough? Let's check for the quadratic terms, by augmenting the plan with a central point repeated 4 times. We also load the `center` field from the `ccd_experiment_yield` dataset:
+
+```{r}
+fpc <- fp %>% 
+  fp_augment_center(rep=4)
+
+fpc$Y[fpc$.treat == "center"] <- ccd_experiment_yield$center
+```
+
+Now we can fit a model with the quadratic term, using either $A$ or $B$: since we only have a central point, we cannot discriminate which factor is contributing to the curvature in the response suface. We get:
+
+```{r}
+fpc %>% 
+  lm(Y ~ A*B+I(A^2), data=.) %>% 
+  anova()
+```
+
+So the contribution of the quadratic term **is significant**. This means that we have to further augment the plan with axial points and investigate a *Central Composite Design* (CCD). **Note**: if the quadratic term contribution were not significant, we would have to remove the quadratic term from the model and accept the two-level model.
+
+So let's load the axial points from the `axial` field of the `ccd_experiment_yield` dataset, and fit a model with the quadratic terms and their interactions:
+
+```{r}
+fpccd <- fpc %>% 
+  fp_augment_axial(rep=2)
+
+fpccd$Y[fpccd$.treat == "axial"] <- ccd_experiment_yield$axial
+
+fpccd %>% 
+  lm(Y ~ A*B*I(A^2)*I(B^2), data=.) %>% 
+  anova()
+```
+
+So we can finally state that a proper model would be `Y ~ A*B+I(A^2)`:
+
+```{r}
+fpccd %>% 
+  lm(Y ~ A*B+I(A^2), data=.) %>% 
+  summary()
+```
 
 
 ## Fractional factorial plan
 
-A full $2^n$ factorial plan can be then reduced to a fractional factorial plan $2^{n-p}$ by applying the `fp_fraction` function $p$ times. For example, to get a $2^{5-2}$ plan with the defining relationships $I=ABCD$ and $I=BCDE$:
+It is possible to divide a design matrix into a fractional factorial plan using the `fp_fraction` function. The fraction uses a **defining relationship** (*dr*) as $I=ABCD$, which is mapped in R as a one side formula `~A*B*C*D`.
+
+Any fraction is added to the `factorial.plan` object in the `fraction` attribute.
+
+A full $2^n$ factorial plan can be reduced to a fractional factorial plan $2^{n-p}$ by applying the `fp_fraction` function $p$ times. For example, to get a $2^{5-2}$ plan with the defining relationships $I=ABCD$ and $I=BCDE$:
 
 ```{r}
 fp_design_matrix(5) %>% 
@@ -85,15 +164,40 @@ fp_design_matrix(3) %>%
   fp_fraction(~A*B*C, remove=FALSE)
 ```
 
+Also, note that the `remove` option is sticky, so that when you can apply the `fp_fraction` function multiple times and the first time has the option set to `remove=FALSE`, then all the following `fp_fraction` calls will have the same option set to `FALSE`. Setting `remove=FALSE` to any of the following calls **can have unexpected behavior**.
+
 
 ## Alias structure
 
-The functions `fp_alias` and `fp_alias_list` can be used to generate the alias structure of a fractional factorial plan. **This functionalities are currently under development**
+Any fraction of a factorial plan results in a set of *aliases* among effects. The package provides the following functions to deal with alias structures:
+
+- `fp_alias_matrix`: returns a matrix with the alias structure of the factors in the design matrix. The alias matrix has a plot method.
+- `fp_all_drs`: given a set of defining relationships, returns the dependent one.
+- `fp_merge_drs`: given a set of defining relationships, returns the merged one, i.e. the one having all the factors.
+- `fp_gen2alias`: given a *generator* (i.e. the right side of a DR) and an effect name as strings, calculates the resulting alias.
+
+For example:
+
+```{r}
+(am <- fp_alias_matrix(~A*B*C, ~B*C*D))
+```
+
+
+```{r}
+am %>% plot()
+```
+
+The design matrix can be converted to a tibble thanks to the proper `as_tibble.design.matrix` S3 method:
+
+```{r}
+am %>% as_tibble()
+```
+
 
 
 # Statistics
 
-The package provides some useful functions for statistical analysys of data.
+The package also provides some useful functions for statistical analysis of data.
 
 ## Plotting
 

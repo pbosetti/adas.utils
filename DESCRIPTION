@@ -1,12 +1,12 @@
 Package: adas.utils
 Title: Utility functions for the ADAS course, University of Trento, Italy
-Version: 0.3.0
+Version: 0.4.0
 Authors@R: 
     person("Paolo", "Bosetti", , "paolo.bosetti@unitn.it", role = c("aut", "cre"))
 Description: Utility functions for the ADAS course, University of Trento, Italy
 Depends: 
     R (>= 4.0.0)
-License: MIT + file LICENSE
+License: CC BY 4.0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
@@ -20,7 +20,8 @@ Imports:
     rlang,
     scales,
     stringr,
-    tibble
+    tibble,
+    tidyr
 LazyData: true
 Suggests: 
     knitr,

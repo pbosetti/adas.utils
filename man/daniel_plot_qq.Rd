@@ -21,5 +21,5 @@ Given a non-replicated model of a factorial plan, this function provides a
 QQ plot of the effects of the model, labeling all the effects.
 }
 \examples{
-daniel_plot(lm(Y~A*B*C*D, data=filtration))
+daniel_plot_qq(lm(Y~A*B*C*D, data=filtration))
 }

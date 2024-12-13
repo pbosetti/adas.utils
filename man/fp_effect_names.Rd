@@ -13,7 +13,11 @@ fp_effect_names(arg)
 An ordered factor with the effect names
 }
 \description{
-Returns the effect names from a formula, according to Yate's convention.
+Returns the effect names from a formula, according to Yates' convention.
+}
+\details{
+Defining relationships are represented as one side formulas, e.g. $I=ABC$
+becomes \code{~A*B*C}.
 }
 \examples{
 fp_effect_names(~A*B*C)
