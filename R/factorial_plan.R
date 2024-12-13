@@ -144,6 +144,34 @@ fp_add_scale <- function(dm, ..., suffix="_s") {
 }
 
 
+#' Add factor names to a design matrix
+#'
+#' @param dm the design matrix
+#' @param ... a set of factors to name, with their respective names, e.g.
+#' `A="Temperature", B="Pressure"`. If the factor is not in the design matrix
+#' factors list, a warning is printed and the factor is skipped
+#'
+#' @return the design matrix with the named factors
+#' @export
+#'
+#' @examples
+#' fp_design_matrix(3, rep=2) %>%
+#'   fp_add_names(A="Temperature", B="Pressure")
+fp_add_names <- function(dm, ...) {
+  attr(dm, "factor.names") <- list()
+  for (i in 1:...length()) {
+    factor <- ...names()[i]
+    name <- ...elt(i)
+    if (!(is.character(name) & factor %in% attr(dm, "factors"))) {
+      warning("Skipping factor ", name, " (not in factors list)\n")
+      next
+    }
+    attr(dm, "factor.names") <- append(attr(dm, "factor.names"), setNames(list(name), factor))
+  }
+  return(dm)
+}
+
+
 #' Print a factorial plan design matrix
 #'
 #' @param x the matrix
@@ -163,6 +191,11 @@ print.factorial.plan <- function(x, ...) {
     cat("Scaled factors:\n")
     iwalk(attr(x, "scales"), ~ glue::glue("  {.y}: [{.x[1]}, {.x[2]}]") %>% cat(sep="\n"))
   }
+  if (attr(x, "factor.names") %>% length() > 0) {
+    cat("Factor names:\n")
+    iwalk(attr(x, "factor.names"), ~ glue::glue("  {.y}: {.x}") %>% cat(sep="\n"))
+  }
+  print("\n")
   print(x, ...)
 }
 
@@ -651,6 +684,7 @@ print.alias.matrix <- function(x, ...) {
     unlist() %>%
     cat("Defining relationships:\n", ., "\n\n")
   attr(x, "defining.relationships") <- NULL
+  print("\n")
   print(x, ...)
 }
 
