@@ -25,5 +25,5 @@ i.e. factors reported in real units rather in coded units (e.g. -1, 1).
 }
 \examples{
 fp_design_matrix(3, rep=2) \%>\%
-  fp_add_scale(dm, A=c(10, 30), B=c(0, 1), suffix=".scaled")
+  fp_add_scale(A=c(10, 30), B=c(0, 1), suffix=".scaled")
 }
