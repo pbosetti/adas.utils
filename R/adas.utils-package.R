@@ -40,6 +40,7 @@
 #' @importFrom ggplot2 stat_qq
 #' @importFrom ggplot2 theme
 #' @importFrom glue glue
+#' @importFrom lubridate stamp
 #' @importFrom purrr accumulate
 #' @importFrom purrr discard
 #' @importFrom purrr iwalk

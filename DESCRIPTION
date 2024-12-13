@@ -1,6 +1,6 @@
 Package: adas.utils
 Title: Utility functions for the ADAS course, University of Trento, Italy
-Version: 0.4.2
+Version: 0.4.3
 Authors@R: 
     person("Paolo", "Bosetti", , "paolo.bosetti@unitn.it", role = c("aut", "cre"))
 Description: Utility functions for the ADAS course, University of Trento, Italy
@@ -15,6 +15,7 @@ Imports:
     gghalfnorm,
     ggplot2,
     glue,
+    lubridate,
     magrittr,
     purrr,
     readr,
