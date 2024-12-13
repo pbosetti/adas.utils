@@ -4,9 +4,9 @@
 \name{adas.utils-package}
 \alias{adas.utils}
 \alias{adas.utils-package}
-\title{adas.utils: Utility Functions for the ADAS Course, University of Trento, Italy}
+\title{adas.utils: Design of Experiments and Factorial Plans for the ADAS Course, University of Trento, Italy}
 \description{
-The package contains functions to create and analyze factorial plans according to the Design of Experiments (DoE) approach, with the addition of some utility function to perform some statistical analyses.
+A number of functions to create and analyze factorial plans according to the Design of Experiments (DoE) approach, with the addition of some utility function to perform some statistical analyses.
 }
 \author{
 \strong{Maintainer}: Paolo Bosetti \email{paolo.bosetti@unitn.it}
