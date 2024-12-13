@@ -140,6 +140,8 @@ fp_add_scale <- function(dm, ..., suffix="_s") {
       )
     attr(dm, "scales") <- append(attr(dm, "scales"), setNames(list(rng), name))
   }
+  dm <- dm %>%
+    relocate(Y, .after=last_col())
   return(dm)
 }
 
@@ -172,6 +174,42 @@ fp_add_names <- function(dm, ...) {
 }
 
 
+#' Factorial plan info
+#'
+#' Print information about the factorial plan.
+#'
+#' @param x the factorial plan
+#' @param file the file to write the information to. Use console if empty
+#' @param comment a comment mark to add before each line of the information
+#'
+#' @export
+#'
+#' @examples
+#' fp_design_matrix(3, rep=2) %>%
+#'   fp_info()
+fp_info <- function(x, file="", comment="") {
+  cat(comment, "Factorial Plan Design Matrix\n", file=file)
+  cat(comment, "Defining Relationship: ", as.character(attr(x, "def.rel")), "\n", file=file, append=TRUE)
+  cat(comment, "Factors: ", attr(x, "factors"), "\n", file=file, append=TRUE)
+  cat(comment, "Levels: ", attr(x, "levels"), "\n", file=file, append=TRUE)
+  cat(comment, "Fraction: ", attr(x, "fraction"), "\n", file=file, append=TRUE)
+  cat(comment, "Type: ", attr(x, "type"), "\n", file=file, append=TRUE)
+  if (attr(x, "scales") %>% length() > 0) {
+    cat(comment, "Scaled factors:\n", file=file, append=TRUE)
+    iwalk(attr(x, "scales"), \(.x, .y) {
+      cat(comment, "  ", glue::glue("{.y}: [{.x[1]}, {.x[2]}]\n\n"), file=file, append=TRUE)
+    })
+  }
+  if (attr(x, "factor.names") %>% length() > 0) {
+    cat(comment, "Factor names:\n", file=file, append=TRUE)
+    iwalk(attr(x, "factor.names"), \(.x, .y) {
+      cat(comment, "  ",  glue::glue("{.y}: {.x}\n\n"), file=file, append=TRUE)
+    })
+  }
+  cat(comment, "\n", file=file, append=TRUE)
+}
+
+
 #' Print a factorial plan design matrix
 #'
 #' @param x the matrix
@@ -181,23 +219,85 @@ fp_add_names <- function(dm, ...) {
 #' @noRd
 print.factorial.plan <- function(x, ...) {
   class(x) <- Filter(function(x) x!="factorial.plan", class(x))
-  cat("Factorial Plan Design Matrix\n")
-  cat("Defining Relationship: ", as.character(attr(x, "def.rel")), "\n")
-  cat("Factors: ", attr(x, "factors"), "\n")
-  cat("Levels: ", attr(x, "levels"), "\n")
-  cat("Fraction: ", attr(x, "fraction"), "\n")
-  cat("Type: ", attr(x, "type"), "\n")
-  if (attr(x, "scales") %>% length() > 0) {
-    cat("Scaled factors:\n")
-    iwalk(attr(x, "scales"), ~ glue::glue("  {.y}: [{.x[1]}, {.x[2]}]") %>% cat(sep="\n"))
-  }
-  if (attr(x, "factor.names") %>% length() > 0) {
-    cat("Factor names:\n")
-    iwalk(attr(x, "factor.names"), ~ glue::glue("  {.y}: {.x}") %>% cat(sep="\n"))
-  }
-  print("\n")
+  fp_info(x)
   print(x, ...)
 }
+
+
+#' Save a design matrix to a CSV file
+#'
+#' Writes the design matrix to a CSV file, with a timestamp and comment lines.
+#'
+#' Note that the design matrix is saved in the same order of the `RunOrder`
+#' column, i.e. random.
+#'
+#' @param dm the design matrix
+#' @param file the file to write the design matrix to
+#' @param comment a comment mark to add before each line of the information
+#' @param timestamp whether to add a timestamp to the file
+#' @param ... other parameters passed to write_csv()
+#' @param type the CSV version (1 or 2)
+#'
+#' @return Invisibly return the design matrix, unchanged, for further piping
+#' @export
+#'
+fp_write_csv <- function(dm, file, comment="# ", timestamp=TRUE, type=c(1,2), ...) {
+  sf <- lubridate::stamp("Created 20/01/2024 03:34:10", quiet=TRUE)
+  fp_info(dm, file=file, comment=comment)
+  if (timestamp)
+    cat(comment, sf(Sys.time()), "\n", file=file, append=TRUE)
+  if (type[1] == 1)
+    dm %>%
+      arrange(RunOrder) %>%
+      write_csv(file, append=TRUE, col_names = TRUE, ...)
+  else if (type[1] == 2)
+    dm %>%
+      arrange(RunOrder) %>%
+      write_csv2(file, append=TRUE, col_names = TRUE, ...)
+  else
+    stop("Invalid CSV type")
+  invisible(dm)
+}
+
+
+#' Load a design matrix from a CSV file
+#'
+#' Load from a CSV file the design matrix that has previously been saved with
+#' `fp_write_csv()`. It is an error if the loaded data frame has different
+#' dimensions or column names than the original design matrix.
+#'
+#' Note that the design matrix is sorted by the `StdOrder` column after loading.
+#'
+#' @param dm the design matrix
+#' @param file the file to read the design matrix from
+#' @param type the CSV version (1 or 2)
+#' @param yield the yield column name
+#' @param comment the comment mark
+#'
+#' @return the design matrix with the new values
+#' @export
+#' @seealso [fp_write_csv()]
+fp_read_csv <- function(dm, file, type=c(1,2), yield="Y", comment="#") {
+  if (type[1] == 1) {
+    n <- read_csv(file, col_names = TRUE, comment=comment, show_col_types = FALSE) %>%
+      arrange(StdOrder)
+  } else if (type[1] == 2) {
+    n <- read_csv2(file, col_names = TRUE, comment=comment, show_col_types = FALSE) %>%
+      arrange(StdOrder)
+  } else {
+    stop("Invalid type")
+  }
+  if (!all(names(n) %in% names(dm))) {
+    cat(names(n), names(dm))
+    stop("Column names do not match")
+  }
+  if(!all(dim(n) == dim(dm))) {
+    stop("Table dimensions do not match")
+  }
+  dm[yield] <- n[yield]
+  return(dm)
+}
+
 
 
 #' Factorial Plan effect names from a formula
@@ -684,7 +784,7 @@ print.alias.matrix <- function(x, ...) {
     unlist() %>%
     cat("Defining relationships:\n", ., "\n\n")
   attr(x, "defining.relationships") <- NULL
-  print("\n")
+  cat("\n")
   print(x, ...)
 }
 

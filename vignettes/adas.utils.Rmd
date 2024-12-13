@@ -43,11 +43,12 @@ fp_design_matrix(~Speed*Weight)
 
 The yield column `Y` must then be completed according to the randomized `RunOrder` column.
 
-It is possible to add custom scales to the factors:
+It is possible to add custom scales to the factors, and also add names to the factors:
 
 ```{r}
 fp_design_matrix(2) %>% 
-  fp_add_scale(A=c(1, 10), B=c(75, 125), suffix=".scaled")
+  fp_add_names(A="Temperature", B="Pressure") %>%
+  fp_add_scale(A=c(20, 25), B=c(75, 125), suffix=".scaled")
 ```
 
 
@@ -141,6 +142,29 @@ fpccd %>%
   lm(Y ~ A*B+I(A^2), data=.) %>% 
   summary()
 ```
+
+## Save to/load from a file
+
+Once the design matrix is prepared, you typically want to save it to a file and use it for collecting data form experiments. You can use the `write.csv` function, but it is recommended to use the `fp_write_csv` function, which will also save the design matrix properties as comments:
+
+```{r eval=FALSE}
+dm <-  fp_design_matrix(2) %>% 
+  fp_add_names(A="Temperature", B="Pressure") %>% 
+  fp_add_scale(A=c(2, 12), B=c(40, 60), suffix="_s") %>%
+  fp_write_csv("design_matrix.csv")
+```
+
+Note that the `fp_write_csv` function invisibly returns the same design matrix, so you can use it in a pipe chain. Also, the CVS files has the rows arranged in the same order as the `RunOrder` column (i.e. randomized). 
+
+Once the CSV file has been completed, you can load it back into R using the `fp_read_csv` function:
+
+```{r eval=FALSE}
+dm <- dm %>% 
+  fp_read_csv("design_matrix.csv")
+```
+
+Note that `fp_read_csv` returns the design matrix reordered according to Yates' standard order.
+
 
 
 ## Fractional factorial plan
