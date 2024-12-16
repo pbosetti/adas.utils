@@ -7,7 +7,8 @@
 fp_alias_matrix(...)
 }
 \arguments{
-\item{...}{one or more formulas, or a single list of formulas}
+\item{...}{one or more formulas, or a single list of formulas, or a
+fractional factorial plan}
 }
 \value{
 a square matrix
@@ -16,6 +17,21 @@ a square matrix
 Given a list of formulas (defining relationships), this function returns
 a matrix of all possible aliases.
 }
+\details{
+It is also possible to pass a fractional factorial plan, in which case the
+defining relationships will be extracted from it.
+}
 \examples{
+# with formulas:
 fp_alias_matrix(~A*B*C, ~B*C*D)
+
+# with a fractional factorial plan:
+fp_design_matrix(5) \%>\%
+  fp_fraction(~A*B*C*D) \%>\%
+  fp_fraction(~B*C*D*E) \%>\%
+  fp_alias_matrix() \%>\%
+  plot()
+}
+\seealso{
+\code{\link[=fp_fraction]{fp_fraction()}}
 }

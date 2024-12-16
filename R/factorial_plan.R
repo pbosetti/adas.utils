@@ -100,6 +100,7 @@ fp_design_matrix <- function(arg, rep = 1, levels = c(-1,1)) {
   if (length(levels) == 2) dm <- mutate(dm, .treat= rep(fp_treatments(arg), rep), .after=RunOrder)
   class(dm) <- c("factorial.plan", class(dm))
   attr(dm, "def.rel") <- fp_defrel(arg)
+  attr(dm, "generators") <- NA
   attr(dm, "factors") <- fct
   attr(dm, "fraction") <- NA
   attr(dm, "levels") <- levels
@@ -482,6 +483,7 @@ fp_fraction <- function(dm, formula, remove=TRUE) {
   `:=` <- NULL
   stopifnot(is_formula(formula))
   stopifnot("factorial.plan" %in% class(dm))
+  attr(formula, ".Environment") <- .GlobalEnv
 
   if (!is.na(attr(dm, "fraction"))) remove = attr(dm, "removed")
 
@@ -501,10 +503,14 @@ fp_fraction <- function(dm, formula, remove=TRUE) {
     mutate(
       !!i := eval(e)
     )
-  if (is.na(attr(dm, "fraction")))
+  if (is.na(attr(dm, "fraction"))) {
     attr(dm, "fraction") <- paste0("I=", i)
-  else
+    attr(dm, "generators") <- list(formula)
+  }
+  else {
     attr(dm, "fraction") <- c(attr(dm, "fraction"), paste0("I=", i))
+    attr(dm, "generators") <- c(attr(dm, "generators"), formula)
+  }
 
   attr(dm, "removed") <- remove
 
@@ -711,21 +717,38 @@ formula2effect <- function(f) {
 
 
 
+
 #' Build the alias matrix
 #'
 #' Given a list of formulas (defining relationships), this function returns
 #' a matrix of all possible aliases.
 #'
-#' @param ... one or more formulas, or a single list of formulas
+#' It is also possible to pass a fractional factorial plan, in which case the
+#' defining relationships will be extracted from it.
+#'
+#' @param ... one or more formulas, or a single list of formulas, or a
+#' fractional factorial plan
 #'
 #' @return a square matrix
 #' @export
 #'
+#' @seealso [fp_fraction()]
 #' @examples
+#' # with formulas:
 #' fp_alias_matrix(~A*B*C, ~B*C*D)
+#'
+#' # with a fractional factorial plan:
+#' fp_design_matrix(5) %>%
+#'   fp_fraction(~A*B*C*D) %>%
+#'   fp_fraction(~B*C*D*E) %>%
+#'   fp_alias_matrix() %>%
+#'   plot()
 fp_alias_matrix <- function(...) {
   . <- NULL
-  drs <- fp_all_drs(...)
+  if ("factorial.plan" %in% class(..1))
+    drs <- fp_all_drs(attr(..1, "generators"))
+  else
+    drs <- fp_all_drs(...)
   m <- drs %>%
     fp_merge_drs() %>%
     fp_alias_list() %>%
@@ -743,6 +766,7 @@ fp_alias_matrix <- function(...) {
   attr(m, "defining.relationships") <- drs
   return(m)
 }
+
 
 #' Convert an alias matrix to a tibble
 #'
@@ -788,11 +812,10 @@ print.alias.matrix <- function(x, ...) {
   . <- NULL
   class(x) <- Filter(function(x) x!="alias.matrix", class(x))
   attr(x, "defining.relationships") %>%
-    map(~ formula2effect(.)) %>%
+    map(~ paste0("I=", formula2effect(.))) %>%
     unlist() %>%
     cat("Defining relationships:\n", ., "\n\n")
   attr(x, "defining.relationships") <- NULL
-  cat("\n")
   print(x, ...)
 }
 

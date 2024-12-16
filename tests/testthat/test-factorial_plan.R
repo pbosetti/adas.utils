@@ -44,3 +44,15 @@ test_that("fp_alias_list works", {
            ABC = character(0))
   )
 })
+
+
+test_that("fp_alias_matrix works", {
+  expect_true({
+    fp_design_matrix(5) %>%
+      fp_fraction(~A*B*C*D) %>%
+      fp_fraction(~B*C*D*E) %>%
+      fp_alias_matrix() %>%
+      plot()
+    TRUE
+  })
+})
