@@ -12,7 +12,7 @@
 \item{...}{further parameters (currently unused)}
 }
 \value{
-a Pareto chart of the effects of the model
+a Pareto chart (GGPlot2 object) of the effects of the model
 
 Invisibly returns a data frame with the absolute effects of the
 model, their sign, and the cumulative effect.

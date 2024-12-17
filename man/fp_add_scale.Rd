@@ -7,17 +7,17 @@
 fp_add_scale(dm, ..., suffix = "_s")
 }
 \arguments{
-\item{dm}{the design matrix to scale}
+\item{dm}{the design matrix to scale.}
 
 \item{...}{a set of factors to scale, with their respective ranges, e.g.
 \verb{A=c(10, 30), B=c(0, 1)}.if the range is not a two-number vector or the
-factor is not numeric, a warning is printed and the factor is skipped}
+factor is not numeric, a warning is printed and the factor is skipped.}
 
 \item{suffix}{the suffix to add to the scaled factor name in creating new
 columns. If the suffix is the empty string, factors are replaced.}
 }
 \value{
-the design matrix with the scaled factors
+the design matrix with the scaled factors.
 }
 \description{
 This function allows to add columns to a design matrix with scaled factor,

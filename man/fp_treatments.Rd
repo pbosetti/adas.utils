@@ -12,7 +12,7 @@ factors are extracted from it. If it is a number, the factors are the first
 \code{n} capital letters.}
 }
 \value{
-A list of treatments
+A list of treatments (character vector).
 }
 \description{
 Builds a list of treatments from a formula, or from a number of factors.

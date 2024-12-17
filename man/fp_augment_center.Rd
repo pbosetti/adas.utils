@@ -7,17 +7,17 @@
 fp_augment_center(dm, rep = 5)
 }
 \arguments{
-\item{dm}{A factorial plan table}
+\item{dm}{A factorial plan table.}
 
-\item{rep}{The number of replications}
+\item{rep}{The number of replications.}
 }
 \value{
-A central composite design
+A central composite design (a \code{factorial.plan} object).
 }
 \description{
 Add the central points to an existing $2^n$ factorial plan.
 }
 \examples{
 fp_design_matrix(3) \%>\%
- fp_augment_center()
+  fp_augment_center()
 }

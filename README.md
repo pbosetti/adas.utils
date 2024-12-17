@@ -51,7 +51,6 @@ x[50] <- 10
 chauvenet(x)
 #> Chauvenet's criterion for sample x
 #> Suspect outlier: 50, value 10
-#> Expected frequency: 5.61978810813674e-11, threshold: 0.5
 #> Decision: reject it
 ```
 
@@ -78,7 +77,7 @@ library(tidyverse)
 #> ✔ dplyr     1.1.4     ✔ readr     2.1.5
 #> ✔ forcats   1.0.0     ✔ stringr   1.5.1
 #> ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-#> ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+#> ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
 #> ✔ purrr     1.0.2     
 #> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 #> ✖ tidyr::extract()   masks magrittr::extract()
@@ -119,7 +118,7 @@ fp_design_matrix(5) %>%
 #>  Factors:  A B C D E 
 #>  Levels:  -1 1 
 #>  Fraction:  I=ABCD I=BCDE 
-#>  Type:  plain 
+#>  Type:  fractional 
 #>  
 #> # A tibble: 8 × 12
 #>   StdOrder RunOrder .treat  .rep     A     B     C     D     E Y      ABCD  BCDE

@@ -7,15 +7,15 @@
 \method{plot}{alias.matrix}(x, ..., compact = TRUE)
 }
 \arguments{
-\item{x}{an alias matrix}
+\item{x}{an alias matrix.}
 
-\item{...}{additional arguments to \code{\link[ggplot2:geom_tile]{ggplot2::geom_tile()}}}
+\item{...}{additional arguments to \code{\link[ggplot2:geom_tile]{ggplot2::geom_tile()}}.}
 
 \item{compact}{logical, if TRUE only positive aliases are shown, omitting
-empty rows and columns}
+empty rows and columns.}
 }
 \value{
-a ggplot object
+a ggplot object.
 }
 \description{
 Produces a tile plot of the alias matrix.

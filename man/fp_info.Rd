@@ -7,11 +7,14 @@
 fp_info(x, file = "", comment = "")
 }
 \arguments{
-\item{x}{the factorial plan}
+\item{x}{the factorial plan.}
 
-\item{file}{the file to write the information to. Use console if empty}
+\item{file}{the file to write the information to. Use console if empty.}
 
-\item{comment}{a comment mark to add before each line of the information}
+\item{comment}{a comment mark to add before each line of the information.}
+}
+\value{
+No return value, just prints the fp information.
 }
 \description{
 Print information about the factorial plan.

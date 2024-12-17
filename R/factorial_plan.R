@@ -7,7 +7,7 @@
 #' formula is built with the number of factors. If it is neither a formula nor a
 #' number, an error is thrown.
 #'
-#' @return A formula
+#' @return A formula.
 #' @noRd
 #'
 #' @examples
@@ -23,7 +23,6 @@ fp_defrel <- function(arg) {
     formula <- arg
   else
     stop("Argument must be either a formula or the number of factors")
-  attr(formula, ".Environment") <- .GlobalEnv
   return(formula)
 }
 
@@ -40,7 +39,7 @@ fp_defrel <- function(arg) {
 #'   factors are extracted from it. If it is a number, the factors are the first
 #'   `n` capital letters.
 #'
-#' @return A list of treatments
+#' @return A list of treatments (character vector).
 #' @export
 #'
 #' @examples
@@ -67,10 +66,19 @@ fp_treatments <- function(arg) {
 #' @param arg Either a formula or a number of factors. If it is a formula, the
 #'   factors are extracted from it. If it is a number, the factors are the first
 #'   `n` capital letters.
-#' @param rep Number of replications
-#' @param levels Levels of the factors
+#' @param rep Number of replications.
+#' @param levels Levels of the factors.
 #'
-#' @return A design matrix: a subclass of a tibble of class `factorial.plan`
+#' @return A design matrix: a subclass of a tibble of class `factorial.plan`.
+#'   The class has the following attributes:
+#'   \describe{
+#'      \item{`def.rel`}{The defining relationship (a formula).}
+#'      \item{`generators`}{The list of generators (formulas) if the factorial plan is fractional.}
+#'      \item{`fraction`}{The list of fractions (character vectors) if the factorial plan is fractional.}
+#'      \item{`levels`}{The levels of the factors (all equal), in coded units.}
+#'      \item{`scales`}{A list: for each factor, a vector of two values corresponding to the extreme values in coded units.}
+#'    }
+#'
 #' @export
 #'
 #' @examples
@@ -115,14 +123,14 @@ fp_design_matrix <- function(arg, rep = 1, levels = c(-1,1)) {
 #' This function allows to add columns to a design matrix with scaled factor,
 #' i.e. factors reported in real units rather in coded units (e.g. -1, 1).
 #'
-#' @param dm the design matrix to scale
+#' @param dm the design matrix to scale.
 #' @param ... a set of factors to scale, with their respective ranges, e.g.
 #' `A=c(10, 30), B=c(0, 1)`.if the range is not a two-number vector or the
-#' factor is not numeric, a warning is printed and the factor is skipped
+#' factor is not numeric, a warning is printed and the factor is skipped.
 #' @param suffix the suffix to add to the scaled factor name in creating new
 #' columns. If the suffix is the empty string, factors are replaced.
 #'
-#' @return the design matrix with the scaled factors
+#' @return the design matrix with the scaled factors.
 #' @export
 #'
 #' @examples
@@ -151,12 +159,15 @@ fp_add_scale <- function(dm, ..., suffix="_s") {
 
 #' Add factor names to a design matrix
 #'
-#' @param dm the design matrix
+#' Store factor names in the `factorial.plan` object, as a list within the
+#' `factor.names` attribute.
+#'
+#' @param dm the design matrix.
 #' @param ... a set of factors to name, with their respective names, e.g.
 #' `A="Temperature", B="Pressure"`. If the factor is not in the design matrix
-#' factors list, a warning is printed and the factor is skipped
+#' factors list, a warning is printed and the factor is skipped.
 #'
-#' @return the design matrix with the named factors
+#' @return the design matrix with the named factors.
 #' @export
 #'
 #' @examples
@@ -181,9 +192,11 @@ fp_add_names <- function(dm, ...) {
 #'
 #' Print information about the factorial plan.
 #'
-#' @param x the factorial plan
-#' @param file the file to write the information to. Use console if empty
-#' @param comment a comment mark to add before each line of the information
+#' @param x the factorial plan.
+#' @param file the file to write the information to. Use console if empty.
+#' @param comment a comment mark to add before each line of the information.
+#'
+#' @return No return value, just prints the fp information.
 #'
 #' @export
 #'
@@ -215,8 +228,10 @@ fp_info <- function(x, file="", comment="") {
 
 #' Print a factorial plan design matrix
 #'
-#' @param x the matrix
-#' @param ... other parameters passed to print()
+#' @param x the matrix.
+#' @param ... other parameters passed to print().
+#'
+#' @return No return value, just prints the factorial plan.
 #'
 #' @export
 #' @noRd
@@ -234,14 +249,14 @@ print.factorial.plan <- function(x, ...) {
 #' Note that the design matrix is saved in the same order of the `RunOrder`
 #' column, i.e. random.
 #'
-#' @param dm the design matrix
-#' @param file the file to write the design matrix to
-#' @param comment a comment mark to add before each line of the information
-#' @param timestamp whether to add a timestamp to the file
-#' @param ... other parameters passed to write_csv()
-#' @param type the CSV version (1 or 2)
+#' @param dm the design matrix.
+#' @param file the file to write the design matrix to.
+#' @param comment a comment mark to add before each line of the information.
+#' @param timestamp whether to add a timestamp to the file.
+#' @param ... other parameters passed to write_csv().
+#' @param type the CSV version (1 or 2).
 #'
-#' @return Invisibly return the design matrix, unchanged, for further piping
+#' @return Invisibly return the design matrix, unchanged, for further piping.
 #' @export
 #'
 fp_write_csv <- function(dm, file, comment="# ", timestamp=TRUE, type=c(1,2), ...) {
@@ -272,13 +287,13 @@ fp_write_csv <- function(dm, file, comment="# ", timestamp=TRUE, type=c(1,2), ..
 #'
 #' Note that the design matrix is sorted by the `StdOrder` column after loading.
 #'
-#' @param dm the design matrix
-#' @param file the file to read the design matrix from
-#' @param type the CSV version (1 or 2)
-#' @param yield the yield column name
-#' @param comment the comment mark
+#' @param dm the design matrix.
+#' @param file the file to read the design matrix from.
+#' @param type the CSV version (1 or 2).
+#' @param yield the yield column name.
+#' @param comment the comment mark.
 #'
-#' @return the design matrix with the new values
+#' @return the design matrix with the new values.
 #' @export
 #' @seealso [fp_write_csv()]
 fp_read_csv <- function(dm, file, type=c(1,2), yield="Y", comment="#") {
@@ -312,9 +327,9 @@ fp_read_csv <- function(dm, file, type=c(1,2), yield="Y", comment="#") {
 #' Defining relationships are represented as one side formulas, e.g. $I=ABC$
 #' becomes `~A*B*C`.
 #'
-#' @param arg A formula
+#' @param arg A formula.
 #'
-#' @return An ordered factor with the effect names
+#' @return An ordered factor with the effect names.
 #' @export
 #'
 #' @examples
@@ -326,19 +341,10 @@ fp_effect_names <- function(arg) {
     attr("factors") %>%
     as_tibble() %>%  {
       bind_rows(.,
-                mutate(.,
-                       p = 0:(n()-1),
-                       w = 2^p
-                ) %>%
-                  mutate(
-                    across(
-                      -(p:w),
-                      ~ .x * w
-                    )
-                  ) %>%
+                mutate(., p = 0:(n() - 1), w = 2 ^ p) %>%
+                  mutate(across(-(p:w), ~ .x * w)) %>%
                   select(-(p:w)) %>%
-                  summarize_all(sum)
-      )
+                  summarize_all(sum))
     } %>% {
       tibble(
         effect = colnames(.) %>% str_remove_all(":"),
@@ -346,7 +352,7 @@ fp_effect_names <- function(arg) {
       )
     } %>%
     arrange(order) %>%
-    pull(effect) %>% factor(., ordered=T, levels=.)
+    pull(effect) %>% factor(., ordered = T, levels = .)
 }
 
 
@@ -358,11 +364,11 @@ fp_effect_names <- function(arg) {
 #' Defining relationships are represented as one side formulas, e.g. $I=ABC$
 #' becomes `~A*B*C`.
 #'
-#' @param arg A formula for the defining relationship
-#' @param A a string representing an effect (e.g. `"AB"`)
-#' @param B a string representing an effect (e.g. `"CD"`)
+#' @param arg A formula for the defining relationship.
+#' @param A a string representing an effect (e.g. `"AB"`).
+#' @param B a string representing an effect (e.g. `"CD"`).
 #'
-#' @return A logical value
+#' @return A logical value.
 #' @noRd
 #'
 #' @seealso [fp_defrel()] [fp_alias()] [fp_alias_list()] [fp_gen2alias()]
@@ -383,9 +389,9 @@ fp_has_alias <- function(arg, A, B) {
 #' Defining relationships are represented as one side formulas, e.g. $I=ABC$
 #' becomes `~A*B*C`.
 #'
-#' @param arg A formula or a number of factors
+#' @param arg A formula or a number of factors.
 #'
-#' @return A matrix of logical values
+#' @return A matrix of logical values.
 #' @noRd
 #' @examples
 #' fp_alias(~A*B*C*D)
@@ -410,10 +416,10 @@ fp_alias <- function(arg) {
 #'
 #' Generators and aliases are strings of capital letters.
 #'
-#' @param generator a generator, in the form of `ABCD...`
-#' @param effect an effect, in the form of `BD...`
+#' @param generator a generator, in the form of `ABCD...`.
+#' @param effect an effect, in the form of `BD...`.
 #'
-#' @return An effect (string)
+#' @return An effect (string).
 #' @export
 #'
 #' @examples
@@ -440,9 +446,9 @@ fp_gen2alias <- function(generator, effect) {
 #' Defining relationships are represented as one side formulas, e.g. $I=ABC$
 #' becomes `~A*B*C`.
 #'
-#' @param arg A formula for the defining relationship, or the number of factors
+#' @param arg A formula for the defining relationship, or the number of factors.
 #'
-#' @return a list of aliases (as formulas)
+#' @return a list of aliases (as formulas).
 #' @noRd
 #'
 #' @examples
@@ -461,14 +467,14 @@ fp_alias_list <- function(arg) {
 
 #' Reduce a Factorial Plan by 1/2 Fraction
 #'
-#' @param dm A factorial plan table
-#' @param formula A formula for the defining relationship
+#' @param dm A factorial plan table.
+#' @param formula A formula for the defining relationship.
 #' @param remove A logical value indicating if the removed columns should be
 #'  removed. This setting is sticky: if it is FALSE and  you pipe the result of
 #'  this function to another `fp_fraction()` call, the columns will be
 #'  kept by default.
 #'
-#' @return A reduced factorial plan table
+#' @return A reduced factorial plan table (a `factorial.plan` object).
 #' @export
 #'
 #' @seealso [fp_design_matrix()]
@@ -483,7 +489,6 @@ fp_fraction <- function(dm, formula, remove=TRUE) {
   `:=` <- NULL
   stopifnot(is_formula(formula))
   stopifnot("factorial.plan" %in% class(dm))
-  attr(formula, ".Environment") <- .GlobalEnv
 
   if (!is.na(attr(dm, "fraction"))) remove = attr(dm, "removed")
 
@@ -513,6 +518,7 @@ fp_fraction <- function(dm, formula, remove=TRUE) {
   }
 
   attr(dm, "removed") <- remove
+  attr(dm, "type") <- "fractional"
 
   if (remove)
     return(dm %>% filter (!!rlang::sym(i) == sign))
@@ -526,15 +532,15 @@ fp_fraction <- function(dm, formula, remove=TRUE) {
 #'
 #' Add the central points to an existing $2^n$ factorial plan.
 #'
-#' @param dm A factorial plan table
-#' @param rep The number of replications
+#' @param dm A factorial plan table.
+#' @param rep The number of replications.
 #'
-#' @return A central composite design
+#' @return A central composite design (a `factorial.plan` object).
 #' @export
 #'
 #' @examples
 #' fp_design_matrix(3) %>%
-#'  fp_augment_center()
+#'   fp_augment_center()
 fp_augment_center <- function(dm, rep=5) {
   stopifnot("factorial.plan" %in% class(dm))
   r <- nrow(dm)
@@ -559,10 +565,10 @@ fp_augment_center <- function(dm, rep=5) {
 #'
 #' Adds the axial points to a $2^n$ centered factorial plan.
 #'
-#' @param dm A factorial plan table, with central points
-#' @param rep The number of replications
+#' @param dm A factorial plan table, with central points.
+#' @param rep The number of replications.
 #'
-#' @return A central composite design
+#' @return A central composite design (a `factorial.plan` object).
 #' @export
 #'
 #' @examples
@@ -604,10 +610,10 @@ fp_augment_axial <- function(dm, rep=1) {
 #' Defining relationships are represented as one side formulas, e.g. $I=ABC$
 #' becomes `~A*B*C`.
 #'
-#' @param f1 a one side formula
-#' @param f2 a one side formula
+#' @param f1 a one side formula.
+#' @param f2 a one side formula.
 #'
-#' @return a formula
+#' @return a formula.
 #' @noRd
 #' @examples
 #' fp_third_dr(~A*B*C, ~B*C*D)
@@ -622,7 +628,6 @@ fp_third_dr <- function(f1, f2) {
     paste0(collapse="*") %>% {
       as.formula(paste0("~",.))
     }
-  attr(f, ".Environment") <- .GlobalEnv
   return(f)
 }
 
@@ -635,9 +640,9 @@ fp_third_dr <- function(f1, f2) {
 #' Defining relationships are represented as one side formulas, e.g. $I=ABC$
 #' becomes `~A*B*C`.
 #'
-#' @param ... formulas, or a single list of formulas
+#' @param ... formulas, or a single list of formulas.
 #'
-#' @return a list of formulas
+#' @return a list of formulas.
 #' @export
 #'
 #' @examples
@@ -676,10 +681,10 @@ fp_all_drs <- function(...) {
 #' Defining relationships are represented as one side formulas, e.g. $I=ABC$
 #' becomes `~A*B*C`.
 #'
-#' @param f1 a formula
-#' @param ... other formulas
+#' @param f1 a formula.
+#' @param ... other formulas.
 #'
-#' @return a formula
+#' @return a formula.
 #' @export
 #'
 #' @examples
@@ -694,7 +699,6 @@ fp_merge_drs <- function(f1, ...) {
     paste0(collapse="*") %>% {
       as.formula(paste0("~",.))
     }
-  attr(f, ".Environment") <- .GlobalEnv
   return(f)
 }
 
@@ -702,9 +706,9 @@ fp_merge_drs <- function(f1, ...) {
 
 #' Transforms a formula into a list of effects
 #'
-#' @param f a one-side formula
+#' @param f a one-side formula.
 #'
-#' @return a string representation of the generator
+#' @return a string representation of the generator.
 #' @noRd
 #' @examples
 #' formula2effect(~A*B*C)
@@ -727,9 +731,11 @@ formula2effect <- function(f) {
 #' defining relationships will be extracted from it.
 #'
 #' @param ... one or more formulas, or a single list of formulas, or a
-#' fractional factorial plan
+#' fractional factorial plan.
 #'
-#' @return a square matrix
+#' @return a square matrix: each cell is `0` if there is no alias, or an
+#'   integer representing the index of the generator that produced that alias
+#'   in the list of generators.
 #' @export
 #'
 #' @seealso [fp_fraction()]
@@ -775,12 +781,12 @@ fp_alias_matrix <- function(...) {
 #' (i.e. right-hand side) of the defining relationship that generates each
 #' alias.
 #'
-#' @param x the alias matrix object
-#' @param ... additional arguments to `as_tibble`
+#' @param x the alias matrix object.
+#' @param ... additional arguments to `as_tibble`.
 #' @param compact a logical: if TRUE, it reports all possible effects
 #'  combinations, even those with no alias.
 #'
-#' @return a tibble
+#' @return a tibble representation of the alias matrix
 #' @export
 #'
 #' @examples
@@ -823,12 +829,12 @@ print.alias.matrix <- function(x, ...) {
 #'
 #' Produces a tile plot of the alias matrix.
 #'
-#' @param x an alias matrix
-#' @param ... additional arguments to [ggplot2::geom_tile()]
+#' @param x an alias matrix.
+#' @param ... additional arguments to [ggplot2::geom_tile()].
 #' @param compact logical, if TRUE only positive aliases are shown, omitting
-#' empty rows and columns
+#' empty rows and columns.
 #'
-#' @return a ggplot object
+#' @return a ggplot object.
 #' @export
 #'
 #' @examples

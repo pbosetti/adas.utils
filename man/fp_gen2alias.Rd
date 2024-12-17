@@ -7,12 +7,12 @@
 fp_gen2alias(generator, effect)
 }
 \arguments{
-\item{generator}{a generator, in the form of \code{ABCD...}}
+\item{generator}{a generator, in the form of \code{ABCD...}.}
 
-\item{effect}{an effect, in the form of \code{BD...}}
+\item{effect}{an effect, in the form of \code{BD...}.}
 }
 \value{
-An effect (string)
+An effect (string).
 }
 \description{
 Given a generator and an effect, this function returns the alias.

@@ -7,10 +7,10 @@
 fp_all_drs(...)
 }
 \arguments{
-\item{...}{formulas, or a single list of formulas}
+\item{...}{formulas, or a single list of formulas.}
 }
 \value{
-a list of formulas
+a list of formulas.
 }
 \description{
 Given two or more independent refining relationships, represented as one

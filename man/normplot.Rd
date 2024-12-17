@@ -16,7 +16,7 @@ normplot(data, var, breaks = seq(0.1, 0.9, 0.1), linecolor = "red")
 \item{linecolor}{the color of the normal probability line}
 }
 \value{
-a normal probability plot (ggplot2)
+a normal probability plot (GGPlot2 object)
 }
 \description{
 Normal probability plot

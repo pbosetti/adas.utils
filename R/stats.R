@@ -3,14 +3,16 @@
 #' Applies the Chauvenet's criterion to a sample, identifying a possible
 #' outlier.
 #'
-#' @param x the sample vector
-#' @param threshold the threshold for the frequency of the suspect outlier
+#' @param x the sample vector.
+#' @param threshold the threshold for the frequency of the suspect outlier.
 #'
-#' @return a list with the following components:
+#' @return an object of class `chauvenet` with the following components:
 #' \describe{
+#'  \item{`sample`}{the name of the sample}
 #'  \item{`s0`}{the maximum difference}
 #'  \item{`index`}{the index of the suspect outlier}
 #'  \item{`value`}{the value of the suspect outlier}
+#'  \item{`expected`}{the expected frequency of the suspect outlier}
 #'  \item{`reject`}{a logical value indicating whether the suspect outlier should be rejected}
 #' }
 #' @export
@@ -25,17 +27,32 @@ chauvenet <- function(x, threshold=0.5) {
   i0 <- which.max(abs.diff)            # posizione mass. diff.
   freq <- length(x) * pnorm(s0, lower.tail = F)
   result <- list(
+    sample = deparse(substitute(x)),
     s0 = s0,
     index = i0,
     value = x[i0],
+    expected = freq,
     reject = freq < threshold
   )
-  samp <- deparse(substitute(x))
-  print(glue("Chauvenet's criterion for sample {samp}"))
-  print(glue("Suspect outlier: {i0}, value {x[i0]}"))
-  print(glue("Expected frequency: {freq}, threshold: {threshold}"))
-  print(glue("Decision: {d}", d=ifelse(result$reject, "reject it", "keep it")))
-  invisible(result)
+  class(result) <- "chauvenet"
+  return(result)
+}
+
+
+#' Print result of Chauvenet's test
+#'
+#' @param x a Chauvenet object
+#' @param ... further arguments currently ignored
+#'
+#' @return No return value, just prints the result
+#' @export
+#' @noRd
+#'
+print.chauvenet <- function(x, ...) {
+  print(glue("Chauvenet's criterion for sample {x$sample}"))
+  print(glue("Suspect outlier: {x$index}, value {x$value}"))
+  print(glue("Expected frequency: {x$expected}, threshold: {x$threshold}"))
+  print(glue("Decision: {d}", d=ifelse(x$reject, "reject it", "keep it")))
 }
 
 
@@ -48,7 +65,7 @@ chauvenet <- function(x, threshold=0.5) {
 #' @param alpha the transparency of the horizontal lines
 #' @param xlim the limits of the x-axis
 #'
-#' @return a QQ plot with the effects of the model
+#' @return a QQ plot (GGPlot2 object) with the effects of the model
 #' @export
 #'
 #' @examples
@@ -79,7 +96,7 @@ daniel_plot_qq <- function(model, alpha=0.5, xlim=c(-3,3)) {
 #' @param model a linear model
 #' @param ... further arguments to [gghalfnorm::gghalfnorm()]
 #'
-#' @return a half-normal plot with the effects of the model
+#' @return a half-normal plot (GGPlot2 object) with the effects of the model
 #' @export
 #' @seealso [gghalfnorm::gghalfnorm()]
 #'
@@ -132,7 +149,7 @@ pareto_chart <- function(obj, ...) {
 #' @param values the column with the values of the data frame
 #' @param ... further parameters (currently unused)
 #'
-#' @return a Pareto chart of the data frame
+#' @return a Pareto chart (GGPlot2 object) of the data frame
 #' @export
 #' @returns Invisibly returns a data frame with the absolute values of the
 #' data frame, their sign, and the cumulative value.
@@ -180,7 +197,7 @@ pareto_chart.data.frame <- function(obj, labels, values, ...) {
 #' @param obj a linear model
 #' @param ... further parameters (currently unused)
 #'
-#' @return a Pareto chart of the effects of the model
+#' @return a Pareto chart (GGPlot2 object) of the effects of the model
 #' @export
 #' @returns Invisibly returns a data frame with the absolute effects of the
 #' model, their sign, and the cumulative effect.
@@ -206,7 +223,7 @@ pareto_chart.lm <- function(obj, ...) {
 #' @param breaks the breaks for the y-axis
 #' @param linecolor the color of the normal probability line
 #'
-#' @return a normal probability plot (ggplot2)
+#' @return a normal probability plot (GGPlot2 object)
 #' @export
 #'
 #' @examples

@@ -12,7 +12,7 @@ daniel_plot_hn(model, ...)
 \item{...}{further arguments to \code{\link[gghalfnorm:gghalfnorm]{gghalfnorm::gghalfnorm()}}}
 }
 \value{
-a half-normal plot with the effects of the model
+a half-normal plot (GGPlot2 object) with the effects of the model
 }
 \description{
 Given a non-replicated model of a factorial plan, this function provides a

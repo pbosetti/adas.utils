@@ -291,3 +291,61 @@ dm %>%
   fp_read_csv("design_matrix.csv")
 ```
 
+
+# Centered design
+
+```{r}
+set.seed(0)
+fp <- fp_design_matrix(2, rep=3) %>% 
+  mutate(Y=f(A, B))
+fp
+```
+
+
+```{r}
+fp %>% 
+  lm(Y ~ A*B, data=.) %>% 
+  anova()
+```
+All factors and their interactions are significant. But is the two-level model enough? Let's check for the quadratic terms, by augmenting the plan with a central point repeated 4 times. We also load the `center` field from the `ccd_experiment_yield` dataset:
+
+```{r}
+set.seed(0)
+f <- function(a, b) {
+  1 + 2*a + 3*b + (3*a^2 + 0.05*b^2)*0.5 + 4*a*b + rnorm(length(a))
+}
+
+fpc <- fp %>% 
+  fp_augment_center(rep=4) %>% 
+  mutate(Y=f(A,B))
+
+fp <- fpc %>% 
+  filter(.treat != "center")
+
+fpc
+
+fpc %>% 
+  lm(Y ~ A*B+I(A^2), data=.) %>% 
+  anova()
+
+fp %>% 
+  lm(Y~A*B, data=.) %>% 
+  predict(newdata=fpc, interval="confidence") %>% 
+  bind_cols(fpc) %>% 
+  filter(.treat == "center") %>% 
+  summarise(lwr=min(lwr), upr=max(upr)) %>% 
+  mutate(what="base") %>% 
+  bind_rows(
+    fpc %>% 
+      filter(.treat == "center") %>% 
+      pull(Y) %>% 
+      t.test() %>% 
+      broom::tidy() %>% 
+      select(lwr=conf.low, upr=conf.high) %>% 
+      mutate("what"="center")
+  ) %>% 
+  ggplot(aes(x=what, ymin=lwr, ymax=upr)) +
+  geom_errorbar()
+```
+
+

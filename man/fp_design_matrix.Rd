@@ -11,12 +11,20 @@ fp_design_matrix(arg, rep = 1, levels = c(-1, 1))
 factors are extracted from it. If it is a number, the factors are the first
 \code{n} capital letters.}
 
-\item{rep}{Number of replications}
+\item{rep}{Number of replications.}
 
-\item{levels}{Levels of the factors}
+\item{levels}{Levels of the factors.}
 }
 \value{
-A design matrix: a subclass of a tibble of class \code{factorial.plan}
+A design matrix: a subclass of a tibble of class \code{factorial.plan}.
+The class has the following attributes:
+\describe{
+\item{\code{def.rel}}{The defining relationship (a formula).}
+\item{\code{generators}}{The list of generators (formulas) if the factorial plan is fractional.}
+\item{\code{fraction}}{The list of fractions (character vectors) if the factorial plan is fractional.}
+\item{\code{levels}}{The levels of the factors (all equal), in coded units.}
+\item{\code{scales}}{A list: for each factor, a vector of two values corresponding to the extreme values in coded units.}
+}
 }
 \description{
 Builds a design matrix from a one side formula or a number of factors.

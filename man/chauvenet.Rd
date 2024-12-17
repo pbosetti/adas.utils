@@ -7,16 +7,18 @@
 chauvenet(x, threshold = 0.5)
 }
 \arguments{
-\item{x}{the sample vector}
+\item{x}{the sample vector.}
 
-\item{threshold}{the threshold for the frequency of the suspect outlier}
+\item{threshold}{the threshold for the frequency of the suspect outlier.}
 }
 \value{
-a list with the following components:
+an object of class \code{chauvenet} with the following components:
 \describe{
+\item{\code{sample}}{the name of the sample}
 \item{\code{s0}}{the maximum difference}
 \item{\code{index}}{the index of the suspect outlier}
 \item{\code{value}}{the value of the suspect outlier}
+\item{\code{expected}}{the expected frequency of the suspect outlier}
 \item{\code{reject}}{a logical value indicating whether the suspect outlier should be rejected}
 }
 }

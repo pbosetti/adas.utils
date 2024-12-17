@@ -7,18 +7,18 @@
 fp_read_csv(dm, file, type = c(1, 2), yield = "Y", comment = "#")
 }
 \arguments{
-\item{dm}{the design matrix}
+\item{dm}{the design matrix.}
 
-\item{file}{the file to read the design matrix from}
+\item{file}{the file to read the design matrix from.}
 
-\item{type}{the CSV version (1 or 2)}
+\item{type}{the CSV version (1 or 2).}
 
-\item{yield}{the yield column name}
+\item{yield}{the yield column name.}
 
-\item{comment}{the comment mark}
+\item{comment}{the comment mark.}
 }
 \value{
-the design matrix with the new values
+the design matrix with the new values.
 }
 \description{
 Load from a CSV file the design matrix that has previously been saved with

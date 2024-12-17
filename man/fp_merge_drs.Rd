@@ -7,12 +7,12 @@
 fp_merge_drs(f1, ...)
 }
 \arguments{
-\item{f1}{a formula}
+\item{f1}{a formula.}
 
-\item{...}{other formulas}
+\item{...}{other formulas.}
 }
 \value{
-a formula
+a formula.
 }
 \description{
 This function, given one or more independent refining relationships, returns

@@ -7,9 +7,9 @@
 fp_fraction(dm, formula, remove = TRUE)
 }
 \arguments{
-\item{dm}{A factorial plan table}
+\item{dm}{A factorial plan table.}
 
-\item{formula}{A formula for the defining relationship}
+\item{formula}{A formula for the defining relationship.}
 
 \item{remove}{A logical value indicating if the removed columns should be
 removed. This setting is sticky: if it is FALSE and  you pipe the result of
@@ -17,7 +17,7 @@ this function to another \code{fp_fraction()} call, the columns will be
 kept by default.}
 }
 \value{
-A reduced factorial plan table
+A reduced factorial plan table (a \code{factorial.plan} object).
 }
 \description{
 Reduce a Factorial Plan by 1/2 Fraction

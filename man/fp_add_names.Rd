@@ -7,17 +7,18 @@
 fp_add_names(dm, ...)
 }
 \arguments{
-\item{dm}{the design matrix}
+\item{dm}{the design matrix.}
 
 \item{...}{a set of factors to name, with their respective names, e.g.
 \verb{A="Temperature", B="Pressure"}. If the factor is not in the design matrix
-factors list, a warning is printed and the factor is skipped}
+factors list, a warning is printed and the factor is skipped.}
 }
 \value{
-the design matrix with the named factors
+the design matrix with the named factors.
 }
 \description{
-Add factor names to a design matrix
+Store factor names in the \code{factorial.plan} object, as a list within the
+\code{factor.names} attribute.
 }
 \examples{
 fp_design_matrix(3, rep=2) \%>\%

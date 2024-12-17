@@ -14,7 +14,7 @@ daniel_plot_qq(model, alpha = 0.5, xlim = c(-3, 3))
 \item{xlim}{the limits of the x-axis}
 }
 \value{
-a QQ plot with the effects of the model
+a QQ plot (GGPlot2 object) with the effects of the model
 }
 \description{
 Given a non-replicated model of a factorial plan, this function provides a

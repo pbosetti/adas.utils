@@ -10,7 +10,9 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.dim=c(8, 4),
+  out.width="100%"
 )
 library(adas.utils)
 library(tidyverse)

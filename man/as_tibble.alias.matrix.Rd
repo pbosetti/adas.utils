@@ -7,15 +7,15 @@
 \method{as_tibble}{alias.matrix}(x, ..., compact = TRUE)
 }
 \arguments{
-\item{x}{the alias matrix object}
+\item{x}{the alias matrix object.}
 
-\item{...}{additional arguments to \code{as_tibble}}
+\item{...}{additional arguments to \code{as_tibble}.}
 
 \item{compact}{a logical: if TRUE, it reports all possible effects
 combinations, even those with no alias.}
 }
 \value{
-a tibble
+a tibble representation of the alias matrix
 }
 \description{
 Given an alias matrix, this function returns a tidy tibble of the

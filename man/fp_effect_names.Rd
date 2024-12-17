@@ -7,10 +7,10 @@
 fp_effect_names(arg)
 }
 \arguments{
-\item{arg}{A formula}
+\item{arg}{A formula.}
 }
 \value{
-An ordered factor with the effect names
+An ordered factor with the effect names.
 }
 \description{
 Returns the effect names from a formula, according to Yates' convention.

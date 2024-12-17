@@ -7,20 +7,20 @@
 fp_write_csv(dm, file, comment = "# ", timestamp = TRUE, type = c(1, 2), ...)
 }
 \arguments{
-\item{dm}{the design matrix}
+\item{dm}{the design matrix.}
 
-\item{file}{the file to write the design matrix to}
+\item{file}{the file to write the design matrix to.}
 
-\item{comment}{a comment mark to add before each line of the information}
+\item{comment}{a comment mark to add before each line of the information.}
 
-\item{timestamp}{whether to add a timestamp to the file}
+\item{timestamp}{whether to add a timestamp to the file.}
 
-\item{type}{the CSV version (1 or 2)}
+\item{type}{the CSV version (1 or 2).}
 
-\item{...}{other parameters passed to write_csv()}
+\item{...}{other parameters passed to write_csv().}
 }
 \value{
-Invisibly return the design matrix, unchanged, for further piping
+Invisibly return the design matrix, unchanged, for further piping.
 }
 \description{
 Writes the design matrix to a CSV file, with a timestamp and comment lines.

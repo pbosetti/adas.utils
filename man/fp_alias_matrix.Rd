@@ -8,10 +8,12 @@ fp_alias_matrix(...)
 }
 \arguments{
 \item{...}{one or more formulas, or a single list of formulas, or a
-fractional factorial plan}
+fractional factorial plan.}
 }
 \value{
-a square matrix
+a square matrix: each cell is \code{0} if there is no alias, or an
+integer representing the index of the generator that produced that alias
+in the list of generators.
 }
 \description{
 Given a list of formulas (defining relationships), this function returns

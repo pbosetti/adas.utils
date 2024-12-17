@@ -16,7 +16,7 @@
 \item{...}{further parameters (currently unused)}
 }
 \value{
-a Pareto chart of the data frame
+a Pareto chart (GGPlot2 object) of the data frame
 
 Invisibly returns a data frame with the absolute values of the
 data frame, their sign, and the cumulative value.

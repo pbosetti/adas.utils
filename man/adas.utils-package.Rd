@@ -4,9 +4,9 @@
 \name{adas.utils-package}
 \alias{adas.utils}
 \alias{adas.utils-package}
-\title{adas.utils: Design of Experiments and Factorial Plans for the ADAS Course, University of Trento, Italy}
+\title{adas.utils: Design of Experiments and Factorial Plans Utilities}
 \description{
-A number of functions to create and analyze factorial plans according to the Design of Experiments (DoE) approach, with the addition of some utility function to perform some statistical analyses.
+A number of functions to create and analyze factorial plans according to the Design of Experiments (DoE) approach, with the addition of some utility function to perform some statistical analyses. DoE approach follows the approach in "Design and Analysis of Experiments" by Douglas C. Montgomery (2019, ISBN:978-1-119-49244-3). The package also provides utilities used in the course "Analysis of Data and Statistics" at the University of Trento, Italy.
 }
 \author{
 \strong{Maintainer}: Paolo Bosetti \email{paolo.bosetti@unitn.it}

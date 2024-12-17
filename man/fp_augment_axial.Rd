@@ -7,12 +7,12 @@
 fp_augment_axial(dm, rep = 1)
 }
 \arguments{
-\item{dm}{A factorial plan table, with central points}
+\item{dm}{A factorial plan table, with central points.}
 
-\item{rep}{The number of replications}
+\item{rep}{The number of replications.}
 }
 \value{
-A central composite design
+A central composite design (a \code{factorial.plan} object).
 }
 \description{
 Adds the axial points to a $2^n$ centered factorial plan.
