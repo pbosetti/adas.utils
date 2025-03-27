@@ -296,9 +296,9 @@ ggTukey.TukeyHSD <- function(obj, which=1, ...){
     rownames_to_column("id") %>%
     rename(min=lwr, max=upr) %>%
     ggplot(aes(x=id)) +
+    geom_hline(yintercept=0, color="red") +
     geom_point(aes(y=diff)) +
     geom_errorbar(aes(ymin=min, ymax=max), width=0.2) +
-    geom_hline(yintercept=0, color="red") +
     labs(y="Difference", x=nm) +
     coord_flip()
 }
@@ -339,6 +339,7 @@ ggTukey.data.frame <- function(obj, formula, which=1, splt=NULL, ...) {
       }) %>%
       bind_rows() %>%
       ggplot(aes(x=!!sym(var), y=diff, color=!!sym(grp))) +
+      geom_hline(yintercept=0, color="red") +
       geom_point(position = position_dodge(0.5)) +
       geom_errorbar(aes(ymin=lwr, ymax=upr), width=0.1, position = position_dodge(0.5)) +
       labs(y="Difference", x=var) +
