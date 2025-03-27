@@ -311,7 +311,7 @@ ggTukey.TukeyHSD <- function(obj, which=1, ...){
 #' @param which the index of the comparison. Used when the formula in the
 #'              undelying aov call has more than one term.
 #' @param splt a formula to split the data frame
-#' @param ... further parameters (currently unused)
+#' @param ... further parameters passed to `TukeyHSD`
 #'
 #' @returns a GGPlot2 object
 #' @export
@@ -332,7 +332,7 @@ ggTukey.data.frame <- function(obj, formula, which=1, splt=NULL, ...) {
     var <- (formula %>% terms() %>% attr("term.labels"))[[1]]
     split(obj, splt) %>%
       map(\(d) {
-        TukeyHSD(aov(formula, data = d))[[which]] %>%
+        TukeyHSD(aov(formula, data = d), ...)[[which]] %>%
           as_tibble(rownames=var) %>%
           select(-`p adj`) %>%
           mutate("{grp}":=unique(pull(d, !!grp)))

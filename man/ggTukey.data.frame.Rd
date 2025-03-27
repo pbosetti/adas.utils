@@ -16,7 +16,7 @@ undelying aov call has more than one term.}
 
 \item{splt}{a formula to split the data frame}
 
-\item{...}{further parameters (currently unused)}
+\item{...}{further parameters passed to \code{TukeyHSD}}
 }
 \value{
 a GGPlot2 object

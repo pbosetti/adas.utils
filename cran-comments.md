@@ -3,4 +3,4 @@
 0 errors | 0 warnings | 1 note
 
 * This is a new release.
-* the 1 note in R CMD check is the `unable to verify current time` one
+* The note is the one about timestamp
