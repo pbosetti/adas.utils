@@ -63,7 +63,23 @@ model. Here is an example:
 daniel_plot_qq(lm(Y~A*B*C*D, data=filtration))
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="50%" />
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="50%" /> \###
+Tukey’s test plot
+
+The `stats::TukeyHSD` function in base R provides a way to perform
+multiple comparisons of means. It can print the results in tabular form
+or can be plotted with the `plot` method:
+
+``` r
+library(tidyverse)
+examples_url("battery.dat") %>%
+  read_table() %>%
+  mutate(across(c(Temperature, Material), factor)) %>%
+  mutate(Material = LETTERS[Material]) %>% 
+  ggTukey(Response~Temperature, splt=~Material)
+```
+
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="50%" />
 
 ### Pareto chart
 
@@ -73,18 +89,6 @@ object. Here is an example:
 
 ``` r
 library(tidyverse)
-#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-#> ✔ dplyr     1.1.4     ✔ readr     2.1.5
-#> ✔ forcats   1.0.0     ✔ stringr   1.5.1
-#> ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-#> ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-#> ✔ purrr     1.0.2     
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ tidyr::extract()   masks magrittr::extract()
-#> ✖ dplyr::filter()    masks stats::filter()
-#> ✖ dplyr::lag()       masks stats::lag()
-#> ✖ purrr::set_names() masks magrittr::set_names()
-#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 set.seed(1)
 tibble(
   val=rnorm(10, sd=5),
@@ -93,7 +97,7 @@ tibble(
   pareto_chart(labels=cat, values=val)
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="50%" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="50%" />
 
 ``` r
 
@@ -101,7 +105,7 @@ tibble(
 pareto_chart(lm(Y~A*B*C*D, data=filtration))
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-2.png" width="50%" />
+<img src="man/figures/README-unnamed-chunk-6-2.png" width="50%" />
 
 ### Design of Experiments
 

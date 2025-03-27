@@ -296,6 +296,47 @@ filtration %>%
 
 Even better, the model can be further reduced to `Y~A*C+A*D`. Compare this conclusion with the last Pareto chart above.
 
+### Tukey's test plot
+
+The `stats::TukeyHSD` function in base R provides a way to perform multiple comparisons of means. It can print the results in tabular form or can be plotted with the `plot` method:
+
+```{r}
+data <- examples_url("battery.dat") %>%
+  read_table() %>%
+  mutate(across(c(Temperature, Material), factor)) %>%
+  mutate(Material = LETTERS[Material])
+
+data.t <- data %>%
+  filter(Material == "A") %>%
+  aov(Response~Temperature, data=.) %>%
+  TukeyHSD()
+
+data.t
+
+data.t %>% plot()
+```
+We provide the `ggTukey` function, that uses `ggplot` to provide a better visualization of the results, with the added advantage of allowing to group the plot by a second factor. It can accept a `TukeyHSD` object:
+
+```{r}
+data.t %>%
+  ggTukey()
+```
+
+Or a data frame and a formula:
+
+```{r}
+data %>%
+  filter(Material == "A") %>%
+  ggTukey(Response~Temperature)
+```
+
+Or a formula and a second split factor formula:
+
+```{r}
+data %>% 
+  ggTukey(Response~Temperature, splt=~Material)
+```
+
 
 # Utilities
 

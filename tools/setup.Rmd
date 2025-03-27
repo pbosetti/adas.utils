@@ -23,7 +23,7 @@ use_import_from(
 
 use_import_from(
   "tibble", 
-  c("tibble", "as_tibble")
+  c("tibble", "as_tibble", "rownames_to_column")
 )
 
 use_import_from("gghalfnorm", "gghalfnorm")
@@ -42,7 +42,7 @@ use_import_from(
 use_import_from(
   "stats", 
   c("as.formula", "coef", "ecdf", "effects", "na.omit",
-               "pnorm", "sd", "setNames", "terms")
+               "pnorm", "sd", "setNames", "terms", "aov", "TukeyHSD")
 )
 
 use_import_from(
@@ -64,6 +64,7 @@ use_import_from(
      "n", 
      "pull",
      "relocate",
+     "rename",
      "rename_with",
      "rowwise",
      "select",
@@ -92,7 +93,9 @@ use_import_from(
   c(
     "aes", 
     "coord_cartesian",
+    "coord_flip",
     "element_text",
+    "fortify",
     "ggplot",
     "geom_col",
     "geom_function",
@@ -103,7 +106,9 @@ use_import_from(
     "geom_qq",
     "geom_qq_line",
     "geom_tile",
+    "geom_errorbar",
     "labs",
+    "position_dodge",
     "scale_fill_viridis_d",
     "scale_y_continuous",
     "sec_axis",
@@ -115,7 +120,7 @@ use_import_from(
 
 use_import_from(
   "rlang", 
-  c("is_formula","sym")
+  c("is_formula","sym", ":=")
 )
 
 use_import_from(

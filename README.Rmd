@@ -59,6 +59,18 @@ Daniel's plot is a QQ plot of the effects of a non-replicated factorial model. H
 ```{r}
 daniel_plot_qq(lm(Y~A*B*C*D, data=filtration))
 ```
+### Tukey's test plot
+
+The `stats::TukeyHSD` function in base R provides a way to perform multiple comparisons of means. It can print the results in tabular form or can be plotted with the `plot` method:
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+examples_url("battery.dat") %>%
+  read_table() %>%
+  mutate(across(c(Temperature, Material), factor)) %>%
+  mutate(Material = LETTERS[Material]) %>% 
+  ggTukey(Response~Temperature, splt=~Material)
+```
 
 ### Pareto chart
 

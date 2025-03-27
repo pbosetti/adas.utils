@@ -252,3 +252,96 @@ normplot <- function(data, var, breaks=seq(0.1, 0.9, 0.1), linecolor="red") {
 }
 
 
+#' ggTukey
+#'
+#' This is a generic function for plotting Tukey's HSD test via GGplot2.
+#'
+#' @param obj an object to plot: either a TukeyHSD object or a data frame
+#' @param ... Other parameters passed to the specialized functions
+#'
+#' @returns a GGPlot2 object
+#' @export
+#'
+ggTukey <- function(obj, ...){
+  UseMethod("ggTukey")
+}
+
+#' ggTukey for TukeyHSD
+#'
+#' Plot Tukey's HSD test via GGplot2.
+#'
+#' @param obj a TukeyHSD object
+#' @param which the index of the comparison. Used when the formula in the
+#'              undelying aov call has more than one term.
+#' @param ... further parameters (currently unused)
+#'
+#' @returns a GGPlot2 object
+#' @export
+#' @seealso [TukeyHSD()] [ggTukey.data.frame()] [ggTukey.TukeyHSD()]]]
+#'
+#' @examples
+#' library(tidyverse)
+#' examples_url("battery.dat") %>%
+#'   read_table() %>%
+#'   mutate(across(c(Temperature, Material), factor)) %>%
+#'   filter(Temperature==15) %>%
+#'   aov(Response~Material, data=.) %>%
+#'   TukeyHSD() %>%
+#'   ggTukey()
+ggTukey.TukeyHSD <- function(obj, which=1, ...){
+  id <- lwr <- upr <- diff <- NULL
+  nm <- names(obj)[[which]]
+  obj[[which]] %>%
+    fortify() %>%
+    rownames_to_column("id") %>%
+    rename(min=lwr, max=upr) %>%
+    ggplot(aes(x=id)) +
+    geom_point(aes(y=diff)) +
+    geom_errorbar(aes(ymin=min, ymax=max), width=0.2) +
+    geom_hline(yintercept=0, color="red") +
+    labs(y="Difference", x=nm) +
+    coord_flip()
+}
+
+
+#' ggTukey for data.frame
+#'
+#' @param obj a data frame
+#' @param formula a formula to be used in the aov call
+#' @param which the index of the comparison. Used when the formula in the
+#'              undelying aov call has more than one term.
+#' @param splt a formula to split the data frame
+#' @param ... further parameters (currently unused)
+#'
+#' @returns a GGPlot2 object
+#' @export
+#'
+#' @examples
+#' library(tidyverse)
+#' examples_url("battery.dat") %>%
+#'   read_table() %>%
+#'   mutate(across(c(Temperature, Material), factor)) %>%
+#'   ggTukey(Response~Material, splt=~Temperature)
+ggTukey.data.frame <- function(obj, formula, which=1, splt=NULL, ...) {
+  id <- lwr <- upr <- diff <- `p adj` <- NULL
+  if (is.null(splt)) {
+    TukeyHSD(aov(formula, data=obj)) %>%
+      ggTukey(which)
+  } else {
+    grp <- (splt %>% terms() %>% attr("term.labels"))[[1]]
+    var <- (formula %>% terms() %>% attr("term.labels"))[[1]]
+    split(obj, splt) %>%
+      map(\(d) {
+        TukeyHSD(aov(formula, data = d))[[which]] %>%
+          as_tibble(rownames=var) %>%
+          select(-`p adj`) %>%
+          mutate("{grp}":=unique(pull(d, !!grp)))
+      }) %>%
+      bind_rows() %>%
+      ggplot(aes(x=!!sym(var), y=diff, color=!!sym(grp))) +
+      geom_point(position = position_dodge(0.5)) +
+      geom_errorbar(aes(ymin=lwr, ymax=upr), width=0.1, position = position_dodge(0.5)) +
+      labs(y="Difference", x=var) +
+      coord_flip()
+  }
+}
