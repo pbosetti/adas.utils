@@ -1,3 +1,7 @@
+# adas.utils 1.1.2
+
+* Improved how ggTukey deals with `conf.level` argument
+
 # adas.utils 1.1.1
 
 * Added missing red line at 0 on ggTukey plot when working on split data.

@@ -291,6 +291,7 @@ ggTukey <- function(obj, ...){
 ggTukey.TukeyHSD <- function(obj, which=1, ...){
   id <- lwr <- upr <- diff <- NULL
   nm <- names(obj)[[which]]
+  cl <- attr(obj, "conf.level")
   obj[[which]] %>%
     fortify() %>%
     rownames_to_column("id") %>%
@@ -299,7 +300,11 @@ ggTukey.TukeyHSD <- function(obj, which=1, ...){
     geom_hline(yintercept=0, color="red") +
     geom_point(aes(y=diff)) +
     geom_errorbar(aes(ymin=min, ymax=max), width=0.2) +
-    labs(y="Difference", x=nm) +
+    labs(
+      y="Difference",
+      x=nm,
+      subtitle=paste0(cl * 100, "% family-wise confidence level")
+    ) +
     coord_flip()
 }
 
@@ -311,7 +316,7 @@ ggTukey.TukeyHSD <- function(obj, which=1, ...){
 #' @param which the index of the comparison. Used when the formula in the
 #'              undelying aov call has more than one term.
 #' @param splt a formula to split the data frame
-#' @param ... further parameters passed to `TukeyHSD`
+#' @param ... further parameters passed to `TukeyHSD` (e.g. `conf.level`)
 #'
 #' @returns a GGPlot2 object
 #' @export
@@ -321,15 +326,16 @@ ggTukey.TukeyHSD <- function(obj, which=1, ...){
 #' examples_url("battery.dat") %>%
 #'   read_table() %>%
 #'   mutate(across(c(Temperature, Material), factor)) %>%
-#'   ggTukey(Response~Material, splt=~Temperature)
+#'   ggTukey(Response~Material, splt=~Temperature, conf.level=0.99)
 ggTukey.data.frame <- function(obj, formula, which=1, splt=NULL, ...) {
   id <- lwr <- upr <- diff <- `p adj` <- NULL
   if (is.null(splt)) {
-    TukeyHSD(aov(formula, data=obj)) %>%
+    TukeyHSD(aov(formula, data=obj), ...) %>%
       ggTukey(which)
   } else {
     grp <- (splt %>% terms() %>% attr("term.labels"))[[1]]
     var <- (formula %>% terms() %>% attr("term.labels"))[[1]]
+    cl <- ifelse("conf.level" %in% ...names(), list(...)$conf.level, 0.95)
     split(obj, splt) %>%
       map(\(d) {
         TukeyHSD(aov(formula, data = d), ...)[[which]] %>%
@@ -341,8 +347,13 @@ ggTukey.data.frame <- function(obj, formula, which=1, splt=NULL, ...) {
       ggplot(aes(x=!!sym(var), y=diff, color=!!sym(grp))) +
       geom_hline(yintercept=0, color="red") +
       geom_point(position = position_dodge(0.5)) +
-      geom_errorbar(aes(ymin=lwr, ymax=upr), width=0.1, position = position_dodge(0.5)) +
-      labs(y="Difference", x=var) +
+      geom_errorbar(aes(ymin=lwr, ymax=upr), width=0.1,
+                    position = position_dodge(0.5)) +
+      labs(
+        y="Difference",
+        x=var,
+        subtitle=paste0(cl * 100, "% family-wise confidence level")
+      ) +
       coord_flip()
   }
 }
