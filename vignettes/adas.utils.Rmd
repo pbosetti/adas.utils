@@ -301,9 +301,7 @@ Even better, the model can be further reduced to `Y~A*C+A*D`. Compare this concl
 The `stats::TukeyHSD` function in base R provides a way to perform multiple comparisons of means. It can print the results in tabular form or can be plotted with the `plot` method:
 
 ```{r}
-data <- examples_url("battery.dat") %>%
-  read_table() %>%
-  mutate(across(c(Temperature, Material), factor)) %>%
+data <- battery %>%
   mutate(Material = LETTERS[Material])
 
 data.t <- data %>%

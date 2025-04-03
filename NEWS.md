@@ -1,3 +1,7 @@
+# adas.utils 1.1.3
+
+* Added `battery` and `cotton` data frames
+
 # adas.utils 1.1.2
 
 * Improved how ggTukey deals with `conf.level` argument

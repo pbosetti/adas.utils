@@ -297,6 +297,23 @@ dm %>%
 ```
 
 
+## For Tukey
+
+```{r}
+battery <- examples_url("battery.dat") %>% read.table(header=TRUE) %>% 
+  mutate(across(Temperature:Material, factor)) %>% glimpse()
+
+cotton <- examples_url("cotton.dat") %>% read.table(header=TRUE) %>% 
+  mutate(Cotton = factor(Cotton)) %>% 
+  glimpse()
+
+
+usethis::use_data(battery, overwrite=TRUE)
+usethis::use_data(cotton, overwrite=TRUE)
+```
+
+
+
 # Centered design
 
 ```{r}

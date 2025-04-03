@@ -26,3 +26,36 @@
 #'
 #'
 "ccd_experiment_yield"
+
+#' Battery experiment data
+#'
+#' Battery life in hour of a factorial experiment with 2 factors and 3 levels
+#' each. Factors are:
+#'
+#' * `Temperature`: of the battery during the discharge experiment
+#' * `Material`: Plate material for the battery
+#'
+#' Other columns are:
+#'
+#' * `StandardOrder`: Yate's standard order
+#' * `RunOrder`: randomized order, in which tests have been executed
+#' * `Repeat`: repeat number
+#' * `Response`: battery life in hours
+#'
+#' @format A data frame with 36 rows and 6 columns
+#' @references Douglas C. Montgomery, "Design and Analysis of Experiments", 8th edition, Wiley, 2019
+"battery"
+
+#' Cotton yarn experiment data
+#'
+#' Yarn tensile strength in a completely randomized experiment with 5 different
+#' levels of cotton fiber.
+#'
+#' @format A data frame with 25 rows and 3 columns. Columns represent:
+#'
+#'    * `Run`: run order
+#'    * `Cotton`: cotton content in mass percentage
+#'    * `Strength`: yarn tensile strength in N
+#'
+#' @references Douglas C. Montgomery, "Design and Analysis of Experiments", 8th edition, Wiley, 2019
+'cotton'

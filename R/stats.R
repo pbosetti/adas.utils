@@ -281,11 +281,8 @@ ggTukey <- function(obj, ...){
 #'
 #' @examples
 #' library(tidyverse)
-#' examples_url("battery.dat") %>%
-#'   read_table() %>%
-#'   mutate(across(c(Temperature, Material), factor)) %>%
-#'   filter(Temperature==15) %>%
-#'   aov(Response~Material, data=.) %>%
+#' cotton %>%
+#'   aov(Strength~Cotton, data=.) %>%
 #'   TukeyHSD() %>%
 #'   ggTukey()
 ggTukey.TukeyHSD <- function(obj, which=1, ...){
@@ -323,9 +320,7 @@ ggTukey.TukeyHSD <- function(obj, which=1, ...){
 #'
 #' @examples
 #' library(tidyverse)
-#' examples_url("battery.dat") %>%
-#'   read_table() %>%
-#'   mutate(across(c(Temperature, Material), factor)) %>%
+#' battery %>%
 #'   ggTukey(Response~Material, splt=~Temperature, conf.level=0.99)
 ggTukey.data.frame <- function(obj, formula, which=1, splt=NULL, ...) {
   id <- lwr <- upr <- diff <- `p adj` <- NULL

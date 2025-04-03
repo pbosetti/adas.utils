@@ -22,11 +22,8 @@ Plot Tukey's HSD test via GGplot2.
 }
 \examples{
 library(tidyverse)
-examples_url("battery.dat") \%>\%
-  read_table() \%>\%
-  mutate(across(c(Temperature, Material), factor)) \%>\%
-  filter(Temperature==15) \%>\%
-  aov(Response~Material, data=.) \%>\%
+cotton \%>\%
+  aov(Strength~Cotton, data=.) \%>\%
   TukeyHSD() \%>\%
   ggTukey()
 }

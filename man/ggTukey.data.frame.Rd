@@ -26,8 +26,6 @@ ggTukey for data.frame
 }
 \examples{
 library(tidyverse)
-examples_url("battery.dat") \%>\%
-  read_table() \%>\%
-  mutate(across(c(Temperature, Material), factor)) \%>\%
+battery \%>\%
   ggTukey(Response~Material, splt=~Temperature, conf.level=0.99)
 }
