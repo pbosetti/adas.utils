@@ -18,6 +18,11 @@ use_import_from(
 )
 
 use_import_from(
+  "scales", 
+  c("rescale")
+)
+
+use_import_from(
   "readr", c("read_csv", "read_csv2", "write_csv", "write_csv2")
 )
 
@@ -42,7 +47,7 @@ use_import_from(
 use_import_from(
   "stats", 
   c("as.formula", "coef", "ecdf", "effects", "na.omit",
-               "pnorm", "sd", "setNames", "terms", "aov", "TukeyHSD")
+               "pnorm", "sd", "setNames", "terms", "aov", "TukeyHSD", "median")
 )
 
 use_import_from(

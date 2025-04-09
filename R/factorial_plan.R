@@ -145,12 +145,14 @@ fp_add_scale <- function(dm, ..., suffix="_s") {
       warning("Skipping factor ", name, " (it is not a number, or wrong scale range/type provided)\n")
       next
     }
+    n <- paste0(name, suffix)
     dm <- dm %>%
       mutate(
-        !!paste0(name, suffix) := scales::rescale(!!sym(name), to=rng)
+        !!n := scales::rescale(!!sym(name), to=rng)
       )
-    attr(dm, "scales") <- append(attr(dm, "scales"), setNames(list(rng), name))
+    attr(dm, "scales") <- append(attr(dm, "scales"), setNames(list(rng), n))
   }
+  attr(dm, "scales.suffix") <- suffix
   dm <- dm %>%
     relocate(Y, .after=last_col())
   return(dm)
@@ -211,6 +213,7 @@ fp_info <- function(x, file="", comment="") {
   cat(comment, "Fraction: ", attr(x, "fraction"), "\n", file=file, append=TRUE)
   cat(comment, "Type: ", attr(x, "type"), "\n", file=file, append=TRUE)
   if (attr(x, "scales") %>% length() > 0) {
+    cat(comment, glue("Scales suffix: {s}\n\n", s=attr(x, "scales.suffix")), file=file, append=TRUE)
     cat(comment, "Scaled factors:\n", file=file, append=TRUE)
     iwalk(attr(x, "scales"), \(.x, .y) {
       cat(comment, "  ", glue::glue("{.y}: [{.x[1]}, {.x[2]}]\n\n"), file=file, append=TRUE)
@@ -556,6 +559,13 @@ fp_augment_center <- function(dm, rep=5) {
     mutate(
       across({fct}, ~ if_else(.treat=="center", 0, .))
     )
+
+  s <- attr(dm, "scales")
+  for (n in names(s)) {
+    v <- median(s[[n]])
+    dm[dm$.treat=="center", n] <- v
+  }
+
   attr(dm, "type") <- "centered"
   return(dm)
 }
@@ -595,6 +605,14 @@ fp_augment_axial <- function(dm, rep=1) {
           .treat="axial"
         )
     )
+  if (attr(dm, "scales") %>% length() > 0) {
+    f <- attr(dm, "factors")
+    for (n in f) {
+      sn <- paste0(n, attr(dm, "scales.suffix"))
+      r <- attr(dm, "scales")[[sn]]
+      dm[,sn] <- scales::rescale(pull(dm, !!n), from=c(-1, 1), to=r)
+    }
+  }
   attr(dm, "type") <- "composite"
   return(dm)
 }

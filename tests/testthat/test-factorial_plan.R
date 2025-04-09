@@ -30,6 +30,18 @@ test_that("fp_design_matrix works (formula)", {
   expect_equal(treat, c("(1)", "a", "b", "ab", "c", "ac", "bc", "abc"))
 })
 
+test_that("fp_augment_* work", {
+  df <- fp_design_matrix(2) %>%
+    fp_add_names(A="time", B="temperature") %>%
+    fp_add_scale(A=c(20, 25), B=c(75, 125), suffix = ".s") %>%
+    fp_augment_center(rep=5) %>%
+    fp_augment_axial()
+
+  A_s <- df %>% pull(A.s)
+
+  expect_equal(A_s, c(20, 25, 20, 25, 22.5, 22.5, 22.5, 22.5, 22.5, 22.5, 18.9644660940673,
+                      26.0355339059327, 22.5))
+})
 
 test_that("fp_design_matrix works (number)", {
   treat <- fp_design_matrix(3) %>%

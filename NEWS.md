@@ -1,3 +1,7 @@
+# adas.utils 1.1.4
+
+* `fp_augment_*` functions now update scaled units
+
 # adas.utils 1.1.3
 
 * Added `battery` and `cotton` data frames
