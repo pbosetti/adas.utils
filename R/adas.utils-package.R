@@ -72,6 +72,7 @@
 #' @importFrom stats median
 #' @importFrom stats na.omit
 #' @importFrom stats pnorm
+#' @importFrom stats reformulate
 #' @importFrom stats sd
 #' @importFrom stats setNames
 #' @importFrom stats terms

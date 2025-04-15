@@ -11,8 +11,6 @@ examples_url(example)
 }
 \value{
 the full URL for the desired example
-
-an URL string
 }
 \description{
 Provides the URL for the desired example data, so that it can be more easily

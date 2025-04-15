@@ -46,8 +46,10 @@ use_import_from(
 
 use_import_from(
   "stats", 
-  c("as.formula", "coef", "ecdf", "effects", "na.omit",
-               "pnorm", "sd", "setNames", "terms", "aov", "TukeyHSD", "median")
+  c(
+    "as.formula", "coef", "ecdf", "effects", "na.omit",
+    "pnorm", "sd", "setNames", "terms", "aov", "TukeyHSD", 
+    "median", "reformulate")
 )
 
 use_import_from(

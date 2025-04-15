@@ -1,3 +1,7 @@
+# adas.utils 1.2.0
+
+* Added `expand.formula`
+
 # adas.utils 1.1.4
 
 * `fp_augment_*` functions now update scaled units
