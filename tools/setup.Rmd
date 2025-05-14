@@ -303,6 +303,19 @@ dm %>%
   fp_read_csv("design_matrix.csv")
 ```
 
+## Augment and scale
+
+```{r}
+source("../R/factorial_plan.R")
+fp_design_matrix(3) %>% 
+  fp_add_names(A="Temperature", B="Pressure", C="Stir Rate") %>%
+  fp_add_scale(A=c(2, 12), B=c(40, 60), C=c(100, 200), suffix=".s") %>%
+  fp_augment_center(rep=1) %>% 
+  fp_augment_axial(rep=1)
+```
+
+
+
 
 ## For Tukey
 

@@ -213,7 +213,7 @@ fp_info <- function(x, file="", comment="") {
   cat(comment, "Fraction: ", attr(x, "fraction"), "\n", file=file, append=TRUE)
   cat(comment, "Type: ", attr(x, "type"), "\n", file=file, append=TRUE)
   if (attr(x, "scales") %>% length() > 0) {
-    cat(comment, glue("Scales suffix: {s}\n\n", s=attr(x, "scales.suffix")), file=file, append=TRUE)
+    cat(comment, glue::glue("Scales suffix: {s}\n\n", s=attr(x, "scales.suffix")), file=file, append=TRUE)
     cat(comment, "Scaled factors:\n", file=file, append=TRUE)
     iwalk(attr(x, "scales"), \(.x, .y) {
       cat(comment, "  ", glue::glue("{.y}: [{.x[1]}, {.x[2]}]\n\n"), file=file, append=TRUE)
@@ -552,7 +552,7 @@ fp_augment_center <- function(dm, rep=5) {
   dm <- dm %>%
     add_row(
       StdOrder = (r+1):(r+rep),
-      RunOrder = sample((r+1):(r+rep)),
+      RunOrder = sample((r+1):(r+rep), size=rep),
       .treat = "center",
       .rep = 1:rep,
     ) %>%
@@ -586,19 +586,21 @@ fp_augment_center <- function(dm, rep=5) {
 #'   fp_augment_center(rep=4) %>%
 #'   fp_augment_axial()
 fp_augment_axial <- function(dm, rep=1) {
-  . <- axial <- center <- StdOrder <- NULL
+  . <- axial <- center <- d <- StdOrder <- NULL
   n <- length(attr(dm, "factors"))
+  dist <- 2^(n/4)
   dm <- dm %>%
     bind_rows(
-      fp_design_matrix(attr(dm, "def.rel"), rep=rep, levels=(-1:1)*2^(n/4)) %>%
+      fp_design_matrix(attr(dm, "def.rel"), rep=rep, levels=(-1:1)*dist) %>%
         rowwise() %>%
         mutate(
+          d=sum(abs(c_across(attr(., "factors")))) <= dist*1.1,
           axial=prod(c_across(attr(., "factors")))==0,
           center=sum(c_across(attr(., "factors")))==0
         ) %>%
         ungroup() %>%
-        filter(axial & !center) %>%
-        select(-axial, -center) %>%
+        filter(axial & !center & d) %>%
+        select(-axial, -center, -d) %>%
         mutate(
           StdOrder=nrow(dm) + 1:n(),
           RunOrder=sample(StdOrder),

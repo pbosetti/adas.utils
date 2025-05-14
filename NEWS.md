@@ -1,3 +1,7 @@
+# adas.utils 1.2.1
+
+Fixed errors in fp_augment_* functions when using `rep` argument and with scaled factors.
+
 # adas.utils 1.2.0
 
 * Added `expand.formula`

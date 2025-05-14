@@ -24,8 +24,8 @@ examples_url <- function(example) {
 #' @export
 #'
 #' @examples
-#' expand.formula(Y ~ (A + B)^3)
-expand.formula <- function(f) {
+#' expand_formula(Y ~ (A + B)^3)
+expand_formula <- function(f) {
   stopifnot(inherits(f, "formula"))
   reformulate(labels(terms(f)), f[[2]])
 }
