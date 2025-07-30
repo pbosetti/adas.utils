@@ -4,6 +4,7 @@
 # adas.utils
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 The goal of adas.utils is to provide some utility functions to be used
@@ -14,7 +15,7 @@ Trento, Italy. Course contents are on
 ## Installation
 
 You can install the development version of adas.utils from
-[GitHub](https://github.com/) with:
+[GitHub](https://github.com/pbosetti/adas.utils) with:
 
 ``` r
 # install.packages("devtools")

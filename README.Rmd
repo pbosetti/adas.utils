@@ -25,7 +25,7 @@ The goal of adas.utils is to provide some utility functions to be used in the co
 
 ## Installation
 
-You can install the development version of adas.utils from [GitHub](https://github.com/) with:
+You can install the development version of adas.utils from [GitHub](https://github.com/pbosetti/adas.utils) with:
 
 ``` r
 # install.packages("devtools")
