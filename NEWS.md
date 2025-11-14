@@ -1,3 +1,8 @@
+# adas.utils 1.3.0
+
+* Adedd functions that simplify the use of scaled units on plots
+* Imported `add_residuals` and `add_predictions` (with improvements) from the superseded `modelr` library
+
 # adas.utils 1.2.1
 
 Fixed errors in fp_augment_* functions when using `rep` argument and with scaled factors.

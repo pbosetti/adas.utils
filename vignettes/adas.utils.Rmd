@@ -62,6 +62,45 @@ If you want a $k^n$ factorial plan with custom levels, pass the `levels` argumen
 fp_design_matrix(2, levels=-1:1)
 ```
 
+## Interaction plot and response surface
+
+Let's see a full example that defines a $3\cdot 2^2$ full factorial plan with factor names and scales, creates a linear model and creates the interaction plot and the response surface for the model, using the factor scales on secondary axes:
+
+```{r}
+fp <- fp_design_matrix(2, rep=3) %>% 
+  fp_add_names(A="Temperature (°C)", B="Pressure (bar)") %>% 
+  fp_add_scale(A=c(20,30), B=c(2, 3))
+fp$Y <- ccd_experiment_yield$base
+fp.lm <- lm(Y~A*B, data=fp)
+
+fp %>% 
+  mutate(
+    pred = predict(fp.lm),
+    B=factor(B)
+  ) %>% 
+  ggplot(aes(x=A, y=pred, color=B)) + 
+  geom_line() +
+  scale_x_continuous(sec.axis = fp_scaled_axis(fp, "A"))+
+  scale_color_discrete(labels = fp_scale(fp, "B")) +
+  labs(color=fp_name(fp, "B"), y="Yield")
+```
+
+Now let's create the corresponding response surface:
+
+```{r}
+expand.grid(
+  A = seq(-1, 1, length.out=100),
+  B = seq(-1, 1, length.out=100)
+) %>% {
+  mutate(., Y=predict(fp.lm, newdata=.))
+} %>% 
+  ggplot(aes(x=A, y=B, z=Y)) + 
+  geom_contour_filled() + 
+  scale_x_continuous(sec.axis = fp_scaled_axis(fp, "A")) +
+  scale_y_continuous(sec.axis = fp_scaled_axis(fp, "B")) + 
+  labs(fill="Yield")
+```
+
 
 ## Augment a plan
 
@@ -338,9 +377,33 @@ data %>%
 
 # Utilities
 
+## Data loading
+
 This package also provides a function for easily loading data files made available on the accompanying course documentation on <https://paolobosetti.quarto.pub/data>:
 
 ```{r}
 examples_url("battery.dat") %>%  read.table(header=TRUE)
+```
+
+## Imported from `modelr` package
+
+The `modelr` package has been marked as superseded and it is not actively maintained anymore. It provides useful function, though: `add_predictions()` and `add_residuals()`. These functions have been imported into `adas.utils`, with a slight change: `add_predictions()` also accepts further arguments `...` that are passed down to the underlying `predict()` function. This allows to pass the option `interval = c("none", "confidence", "prediction")`:
+
+```{r}
+p <- fp_design_matrix(2, rep=3) %>% 
+  fp_add_names(A="Temperature (°C)", B="Pressure (bar)") %>% 
+  fp_add_scale(A=c(20,30), B=c(2, 3))
+fp$Y <- ccd_experiment_yield$base
+fp.lm <- lm(Y~A*B, data=fp)
+
+fp %>% 
+  add_predictions(fp.lm, interval="confidence") %>% 
+  mutate(B=factor(B)) %>% 
+  ggplot(aes(x=A, y=fit, color=B)) + 
+  geom_ribbon(aes(ymin=lwr, ymax=upr), alpha=1/3) +
+  geom_line() +
+  scale_x_continuous(sec.axis = fp_scaled_axis(fp, "A"))+
+  scale_color_discrete(labels = fp_scale(fp, "B")) +
+  labs(color=fp_name(fp, "B"), y="Yield")
 ```
 

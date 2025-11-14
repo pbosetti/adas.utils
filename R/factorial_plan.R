@@ -8,7 +8,7 @@
 #' number, an error is thrown.
 #'
 #' @return A formula.
-#' @noRd
+#' @export
 #'
 #' @examples
 #' # Defining relationships with three factors
@@ -395,7 +395,8 @@ fp_has_alias <- function(arg, A, B) {
 #' @param arg A formula or a number of factors.
 #'
 #' @return A matrix of logical values.
-#' @noRd
+#' @export
+#'
 #' @examples
 #' fp_alias(~A*B*C*D)
 #' fp_alias(3)
@@ -412,6 +413,7 @@ fp_alias <- function(arg) {
   }
   return(m)
 }
+
 
 #' Given a generator, find the alias
 #'
@@ -452,7 +454,7 @@ fp_gen2alias <- function(generator, effect) {
 #' @param arg A formula for the defining relationship, or the number of factors.
 #'
 #' @return a list of aliases (as formulas).
-#' @noRd
+#' @export
 #'
 #' @examples
 #' fp_alias_list(~A*B*C*D)
@@ -879,4 +881,109 @@ plot.alias.matrix <- function(x, ..., compact=TRUE) {
     theme(
       axis.text.x = element_text(angle=90, hjust=1, vjust=0.5)
     )
+}
+
+
+
+#' Get the full name for a factor
+#'
+#' This is a utility function mostly for internal use.
+#'
+#' @param fp The factorial plan object
+#' @param fct The standard name of the factor as a string (e.g. `"A"`, or `"B"`, etc.)
+#'
+#' @returns A string with the factor full name, if available (must have been
+#'          added with `fp_add_names`). If not, it returns `fct` ditto.
+#' @export
+#'
+#' @seealso [fp_add_names()]
+#' @examples
+#' df <- fp_design_matrix(2) %>%
+#'   fp_add_names(A="Temperature", B="Pressure")
+#' fp_name(df, "A")
+fp_name <- function(fp, fct) {
+  names <- attr(fp, "factor.names")
+  if (is.null(names)) return(fct)
+  else return(names[[fct]])
+}
+
+
+
+#' Retrieve the scale of a factor
+#'
+#' This is a utility function mostly for internal use.
+#'
+#' @param fp The factorial plan object
+#' @param fct The standard name of the factor as a string (e.g. `"A"`, or `"B"`, etc.)
+#'
+#' @returns A vector representing the factor range in scaled units; scales
+#'          must have been added with `fp_add_scale`. If scales are not
+#'          available, the range in coded units is returned (i.e. `c(-1,1)`)
+#' @export
+#' @seealso [fp_add_scale()]
+#' @examples
+#' df <- fp_design_matrix(2) %>%
+#'   fp_add_names(A="Temperature", B="Pressure") %>%
+#'   fp_add_scale(A=c(20,30), B=c(3, 7))
+#' fp_scale(df, "A")
+fp_scale <- function(fp, fct) {
+  suff <- attr(fp, "scales.suffix")
+  scale <- attr(fp, "scales")
+  if (length(scale) == 0) return(range(fp[fct]))
+  else return(scale[[paste0(fct, suff)]])
+}
+
+
+
+#' Create a secondary GGPlot2 axis with scaled units and factor names
+#'
+#' This is useful when creating contour plots for the FP response surface or
+#' factors interaction plots. It allows to add secondary axes that use the
+#' scaled factor units rather than the coded units (in range -1, 1).
+#'
+#' @param fp The factorial plan object
+#' @param fct The standard name of the factor as a string (e.g. `"A"`, or `"B"`, etc.)
+#'
+#' @returns A `ggplot2::sec_axis` object
+#' @export
+#' @seealso [fp_name()] [fp_scale()]
+#' @examples
+#' library(tidyverse)
+#' fp <- fp_design_matrix(2, rep=3) %>%
+#'   fp_add_names(A="Temperature (°C)", B="Pressure (bar)") %>%
+#'   fp_add_scale(A=c(20,30), B=c(2, 3))
+#' fp$Y <- ccd_experiment_yield$base
+#' fp.lm <- lm(Y~A*B, data=fp)
+#'
+#' # Interaction plot:
+#' fp %>%
+#'   mutate(
+#'     pred = predict(fp.lm),
+#'     B=factor(B)
+#'   ) %>%
+#'   ggplot(aes(x=A, y=pred, color=B)) +
+#'   geom_line() +
+#'   scale_x_continuous(sec.axis = fp_scaled_axis(fp, "A"))+
+#'   scale_color_discrete(labels = fp_scale(fp, "B")) +
+#'   labs(color=fp_name(fp, "B"), y="Yield")
+#'
+#' expand.grid(
+#'   A = seq(-1, 1, length.out=100),
+#'   B = seq(-1, 1, length.out=100)
+#' ) %>% {
+#'   mutate(., Y=predict(fp.lm, newdata=.))
+#' } %>%
+#'   ggplot(aes(x=A, y=B, z=Y)) +
+#'   geom_contour_filled() +
+#'   scale_x_continuous(sec.axis = fp_scaled_axis(fp, "A")) +
+#'   scale_y_continuous(sec.axis = fp_scaled_axis(fp, "B")) +
+#'   labs(fill="Yield")
+fp_scaled_axis <- function(fp, fct) {
+  suff <- attr(fp, "scales.suffix")
+  from <- range(fp[fct])
+  to <- fp_scale(fp, fct)
+  ggplot2::sec_axis(
+    \(x) scales::rescale(x, from=from, to=to),
+    name = fp_name(fp, fct)
+  )
 }
