@@ -4,10 +4,17 @@
 \alias{daniel_plot_hn}
 \title{Daniel's plot (half-normal)}
 \usage{
-daniel_plot_hn(model, ...)
+daniel_plot_hn(model, label_n = 6, line.p = c(0, 0.4), ...)
 }
 \arguments{
 \item{model}{a linear model}
+
+\item{label_n}{plot the labels of the highest n values}
+
+\item{line.p}{vector of quantiles to use when fitting the Q-Q line, defaults
+defaults to 0.25 that corresponds to c(0.25, 0.75) on the full set of
+quantiles. If you pass a vector of two elements (first MUST be 0), then the
+line is fitted through the origin and up to 1 minus the second element quantile}
 
 \item{...}{further arguments to \code{\link[gghalfnorm:gghalfnorm]{gghalfnorm::gghalfnorm()}}}
 }

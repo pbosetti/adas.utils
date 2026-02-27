@@ -94,6 +94,11 @@ daniel_plot_qq <- function(model, alpha=0.5, xlim=c(-3,3)) {
 #' half-normal plot of the effects of the model, labeling the main n effects.
 #'
 #' @param model a linear model
+#' @param label_n plot the labels of the highest n values
+#' @param line.p vector of quantiles to use when fitting the Q-Q line, defaults
+#' defaults to 0.25 that corresponds to c(0.25, 0.75) on the full set of
+#' quantiles. If you pass a vector of two elements (first MUST be 0), then the
+#' line is fitted through the origin and up to 1 minus the second element quantile
 #' @param ... further arguments to [gghalfnorm::gghalfnorm()]
 #'
 #' @return a half-normal plot (GGPlot2 object) with the effects of the model
@@ -102,12 +107,15 @@ daniel_plot_qq <- function(model, alpha=0.5, xlim=c(-3,3)) {
 #'
 #' @examples
 #' daniel_plot_hn(lm(Y~A*B*C*D, data=filtration))
-daniel_plot_hn <- function(model, ...) {
-  . <- NULL
+daniel_plot_hn <- function(model, label_n = 6, line.p = c(0, 0.4), ...) {
+  . <- values <- factors <- NULL
   effects(model) %>%
     tail(-1) %>%
-    gghalfnorm(labs=names(.),...) +
-    labs(y="Theoretical quantiles", x="Sample quantiles")
+    tibble(factors = names(.), values=.) %>%
+    ggplot(aes(sample=values, labels=factors)) +
+    geom_qqhn(label_n = label_n) +
+    geom_qqhn_line(line.p = line.p, color="red") +
+    geom_qqhn_band(line.p = line.p, alpha=0.15)
 }
 
 
@@ -163,6 +171,7 @@ pareto_chart <- function(obj, ...) {
 #'   ) %>%
 #'   pareto_chart(labels=cat, values=val)
 pareto_chart.data.frame <- function(obj, labels, values, ...) {
+  .Deprecated("geom_pareto")
   cum <- effect <- NULL
   stopifnot(is.data.frame(obj))
   df <- obj %>%
@@ -212,7 +221,11 @@ pareto_chart.lm <- function(obj, ...) {
   ) %>%
     na.omit() %>%
     filter(factor != "(Intercept)") %>%
-    pareto_chart(labels=factor, values=effect, ...)
+    ggplot(aes(x=factor, y=effect)) +
+    geom_pareto_bars() +
+    geom_pareto_line() +
+    geom_pareto_point() +
+    scale_y_pareto()
 }
 
 

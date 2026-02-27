@@ -1,0 +1,51 @@
+---
+title: "aberration"
+output: html_document
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+library(adas.utils)
+```
+
+
+```{r}
+n=6
+s = 2
+ftr <- LETTERS[1:n]
+combn(ftr, n-s) %>% as.data.frame() %>% 
+  summarize(across(everything(), ~ paste0(., collapse = ""))) %>% as_vector()
+
+```
+5-2
+ABCDE
+ABCxx
+AxxDE
+xBCDE
+
+6-2
+abcdef
+ABCDxx 4
+ABxxEF 4
+xxCDEF 4
+
+7-2
+abcdefgh
+ABCDEFxx 6
+ABCDxxGH 6
+xxxxEFGH 4
+
+7-3
+abcdefg 
+ABCDxxx 4
+ABxxEFx 4
+ABxxxFG 4
+xxCDExG 4
+
+7-4
+abcdefg
+ABCxxxx 3
+AxxDExx 3
+AxxxEFx 3
+AxxxxFG 3
+xBCDxxG 5
