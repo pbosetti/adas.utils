@@ -5,6 +5,11 @@
 
 <!-- badges: start -->
 
+[![Downloads](https://cranlogs.r-pkg.org/badges/adas.utils)](https://cran.r-project.org/package=adas.utils)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/adas.utils)](https://CRAN.R-project.org/package=adas.utils)
+[![R-universe
+version](https://pbosetti.r-universe.dev/adas.utils/badges/version)](https://pbosetti.r-universe.dev/adas.utils)
 <!-- badges: end -->
 
 The goal of adas.utils is to provide some utility functions to be used
@@ -96,6 +101,9 @@ tibble(
   cat=LETTERS[1:length(val)]
   ) %>%
   pareto_chart(labels=cat, values=val)
+#> Warning in pareto_chart.data.frame(., labels = cat, values = val): 'pareto_chart.data.frame' is deprecated.
+#> Use 'geom_pareto' instead.
+#> See help("Deprecated")
 ```
 
 <img src="man/figures/README-unnamed-chunk-6-1.png" width="50%" />
@@ -153,7 +161,7 @@ fp_design_matrix(3, rep=2) %>%
 #>  Fraction:  NA 
 #>  Type:  composite 
 #>  
-#> # A tibble: 45 × 8
+#> # A tibble: 33 × 8
 #>    StdOrder RunOrder .treat  .rep     A     B     C Y    
 #>       <int>    <int> <chr>  <int> <dbl> <dbl> <dbl> <lgl>
 #>  1        1       10 (1)        1    -1    -1    -1 NA   
@@ -166,7 +174,7 @@ fp_design_matrix(3, rep=2) %>%
 #>  8        8       13 abc        1     1     1     1 NA   
 #>  9        9       12 (1)        2    -1    -1    -1 NA   
 #> 10       10       11 a          2     1    -1    -1 NA   
-#> # ℹ 35 more rows
+#> # ℹ 23 more rows
 ```
 
 # Author

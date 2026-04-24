@@ -18,6 +18,9 @@ library(magrittr)
 # adas.utils
 
 <!-- badges: start -->
+[![Downloads](https://cranlogs.r-pkg.org/badges/adas.utils)](https://cran.r-project.org/package=adas.utils) 
+[![CRAN status](https://www.r-pkg.org/badges/version/adas.utils)](https://CRAN.R-project.org/package=adas.utils)
+[![R-universe version](https://pbosetti.r-universe.dev/adas.utils/badges/version)](https://pbosetti.r-universe.dev/adas.utils)
 <!-- badges: end -->
 
 The goal of adas.utils is to provide some utility functions to be used in the course *Analysis of Data and Statistics* at the University of Trento, Italy. Course contents are on <https://paolobosetti.quarto.pub/ADAS/>.
