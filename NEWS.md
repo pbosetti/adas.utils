@@ -1,3 +1,7 @@
+# adas.utils 1.4.1
+
+Fixed URL in `examples_url` function, after quarto.pub shutdown announcement.
+
 # adas.utils 1.4.0
 
 * Added GGPlot2 compatible geometries for half-normal plots and Pareto charts

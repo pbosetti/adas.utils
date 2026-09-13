@@ -45,7 +45,11 @@ test_that("pareto_chart for tibble works", {
     val=rnorm(10, sd=5),
     cat=LETTERS[1:length(val)]
   ) %>%
-    pareto_chart(labels=cat, values=val)
+    ggplot(aes(x=cat, y=val)) +
+    geom_pareto_bars() +
+    geom_pareto_line() +
+    geom_pareto_point() +
+    scale_y_pareto()
   sink()
   expect_true(TRUE)
 })

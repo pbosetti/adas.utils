@@ -11,5 +11,10 @@ A number of functions to create and analyze factorial plans according to the Des
 \author{
 \strong{Maintainer}: Paolo Bosetti \email{paolo.bosetti@unitn.it}
 
+Authors:
+\itemize{
+  \item Paolo Bosetti \email{paolo.bosetti@unitn.it}
+}
+
 }
 \keyword{internal}

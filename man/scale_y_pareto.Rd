@@ -20,7 +20,7 @@ axis is scaled to the current primary-axis maximum.}
 
 \item{percent_name}{Secondary y-axis label.}
 
-\item{...}{Additional arguments passed to \code{\link[ggplot2:scale_continuous]{ggplot2::scale_y_continuous()}}.}
+\item{...}{Additional arguments passed to \code{\link[ggplot2:scale_y_continuous]{ggplot2::scale_y_continuous()}}.}
 }
 \description{
 \code{scale_y_pareto()} configures a primary y-axis for absolute values and a

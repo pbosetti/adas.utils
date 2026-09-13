@@ -11,7 +11,7 @@
 #' @examples
 #' examples_url("battery.dat") |> read.table(header=TRUE)
 examples_url <- function(example) {
-  url = paste0("https://paolobosetti.quarto.pub/data/", example)
+  url = paste0("https://pbosetti.github.io/teaching_site/data/", example)
   return(url)
 }
 
