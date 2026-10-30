@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>adas.utils cheatsheet</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Source+Code+Pro:wght@400;600&display=swap">
+<style>
+  @page { size: 11in 8.5in; margin: 0; }
+  :root {
+    --blue: #1d5c8a; --orange: #e0731f; --green: #3f9b4f;
+    --ink: #222; --mute: #666; --rule: #c9d6e2; --code-bg: #eef3f8;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Source Sans 3", "Helvetica Neue", Arial, sans-serif; color: var(--ink); font-size: 7.8pt; line-height: 1.2; }
+  .page { width: 11in; height: 8.5in; padding: 0.28in 0.32in 0.22in; position: relative; overflow: hidden; page-break-after: always; display: flex; flex-direction: column; }
+  .page:last-child { page-break-after: auto; }
+
+  /* header */
+  header { display: flex; align-items: center; gap: 0.16in; margin-bottom: 0.08in; }
+  header svg { width: 0.85in; height: auto; flex: none; }
+  header h1 { margin: 0; font-size: 25pt; font-weight: 900; letter-spacing: -0.3px; line-height: 1; }
+  header h1 span { color: var(--blue); }
+  header h1 small { font-weight: 400; font-size: 13pt; color: var(--mute); letter-spacing: 1px; margin-left: 6px; }
+  header .intro { margin: 4px 0 0; color: #333; max-width: 8in; font-size: 8.6pt; }
+
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 0.2in; flex: 1; min-height: 0; }
+  .col { display: flex; flex-direction: column; gap: 0.07in; min-width: 0; }
+
+  section h2 { margin: 0 0 3px; font-size: 12.5pt; font-weight: 700; color: var(--blue); border-bottom: 2px solid var(--blue); padding-bottom: 1px; }
+  section h3 { margin: 5px 0 2px; font-size: 8.2pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--orange); }
+  p { margin: 0 0 4px; }
+  .note { color: var(--mute); font-style: italic; font-size: 7.3pt; }
+
+  code, pre { font-family: "Source Code Pro", Menlo, Consolas, monospace; font-size: 6.8pt; }
+  code b, pre b { color: var(--blue); font-weight: 600; }
+  .fn { margin: 0 0 3px; }
+  .fn > code { display: block; }
+  .fn > span { display: block; padding-left: 8px; }
+  pre { background: var(--code-bg); border-left: 3px solid var(--blue); margin: 3px 0 5px; padding: 4px 6px; white-space: pre-wrap; line-height: 1.3; }
+  pre .c { color: #7a8794; font-style: italic; }
+
+  .fig { display: flex; gap: 6px; align-items: center; margin: 2px 0 5px; }
+  .fig img { flex: none; border: 1px solid #e3e8ee; border-radius: 3px; }
+  .fig > div { min-width: 0; }
+  .fig pre { white-space: pre; font-size: 6.1pt; margin: 0; padding: 3px 4px; }
+  .figrow { display: flex; gap: 4px; justify-content: space-between; margin: 3px 0; }
+  .figrow img { border: 1px solid #e3e8ee; border-radius: 3px; width: calc(50% - 2px); }
+
+  table.dm { border-collapse: collapse; font-family: "Source Code Pro", monospace; font-size: 6.6pt; margin: 3px 0 5px; width: 100%; }
+  table.dm th { background: var(--blue); color: white; font-weight: 600; padding: 1px 3px; text-align: center; }
+  table.dm td { padding: 0.5px 3px; text-align: center; border-bottom: 1px solid #e3e8ee; }
+  table.dm th.f, table.dm td.f { background: #fbe7d6; color: var(--ink); }
+  table.dm th.f { background: var(--orange); color: white; }
+  table.dm th.s, table.dm td.s { background: #dcefe0; }
+  table.dm th.s { background: var(--green); color: white; }
+
+  .legend { display: grid; grid-template-columns: auto 1fr; gap: 1px 6px; font-size: 7.6pt; }
+  .legend code { white-space: nowrap; }
+  .chip { display: inline-block; width: 8px; height: 8px; border-radius: 50%; vertical-align: -1px; margin-right: 2px; }
+
+  .flow { display: flex; align-items: stretch; gap: 3px; margin: 4px 0; font-size: 7.4pt; text-align: center; }
+  .flow div { flex: 1; border: 1.5px solid var(--blue); border-radius: 4px; padding: 3px 2px; background: white; }
+  .flow div.mid { border-color: var(--orange); background: #fdf1e7; }
+  .flow i { align-self: center; font-style: normal; color: var(--blue); font-weight: 700; }
+
+  .box { background: #f4f7fa; border-radius: 5px; padding: 6px 8px; }
+
+  footer { margin-top: 0.06in; border-top: 1px solid var(--rule); padding-top: 3px; font-size: 7pt; color: var(--mute); display: flex; justify-content: space-between; }
+  footer a { color: var(--blue); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<!-- ============================== PAGE 1 ============================== -->
+<div class="page">
+<header>
+  <svg viewBox="0 0 120 138" aria-label="adas.utils hex logo">
+    <polygon points="60,3 116,35 116,103 60,135 4,103 4,35" fill="#1d5c8a" stroke="#e0731f" stroke-width="5"/>
+    <rect x="38" y="30" width="44" height="44" fill="none" stroke="#9fc1dc" stroke-width="2"/>
+    <circle cx="60" cy="52" r="31" fill="none" stroke="#9fc1dc" stroke-width="1.2" stroke-dasharray="3 3"/>
+    <g fill="#fff"><circle cx="38" cy="30" r="5"/><circle cx="82" cy="30" r="5"/><circle cx="38" cy="74" r="5"/><circle cx="82" cy="74" r="5"/></g>
+    <circle cx="60" cy="52" r="5" fill="#e0731f"/>
+    <g fill="#7fd08c"><circle cx="29" cy="52" r="4"/><circle cx="91" cy="52" r="4"/><circle cx="60" cy="21" r="4"/><circle cx="60" cy="83" r="4"/></g>
+    <text x="60" y="110" text-anchor="middle" font-family="Source Sans 3, Helvetica, Arial" font-weight="700" font-size="19" fill="#fff">adas.utils</text>
+  </svg>
+  <div>
+    <h1>Design of Experiments with <span>adas.utils</span> <small>:: CHEATSHEET</small></h1>
+    <p class="intro"><b>adas.utils</b> builds and analyses 2<sup>n</sup> factorial plans following Montgomery's <i>Design and Analysis of Experiments</i>. All DoE functions start with <code><b>fp_</b></code>, take and return a <code>factorial.plan</code> tibble, and are pipe-friendly (<code>%&gt;%</code> or <code>|&gt;</code>). Factors are coded <code>-1/+1</code> and named <code>A, B, C…</code></p>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- column 1 -->
+  <div class="col">
+    <section>
+      <h2>Create a design matrix</h2>
+      <div class="fn"><code><b>fp_design_matrix</b>(arg, rep = 1, levels = c(-1, 1))</code>
+        <span><code>arg</code> is the number of factors, or a one-sided formula such as <code>~A*B*C</code>. Rows are in Yates' standard order with a randomised <code>RunOrder</code>.</span></div>
+      <pre>fp_design_matrix(2)</pre>
+      <table class="dm">
+        <tr><th>StdOrder</th><th>RunOrder</th><th>.treat</th><th>.rep</th><th class="f">A</th><th class="f">B</th><th>Y</th></tr>
+        <tr><td>1</td><td>1</td><td>(1)</td><td>1</td><td class="f">-1</td><td class="f">-1</td><td>NA</td></tr>
+        <tr><td>2</td><td>3</td><td>a</td><td>1</td><td class="f">1</td><td class="f">-1</td><td>NA</td></tr>
+        <tr><td>3</td><td>2</td><td>b</td><td>1</td><td class="f">-1</td><td class="f">1</td><td>NA</td></tr>
+        <tr><td>4</td><td>4</td><td>ab</td><td>1</td><td class="f">1</td><td class="f">1</td><td>NA</td></tr>
+      </table>
+      <div class="legend">
+        <code>StdOrder</code><span>Yates' standard order</span>
+        <code>RunOrder</code><span>randomised order: run tests this way</span>
+        <code>.treat</code><span>treatment code: <code>(1)</code>, <code>a</code>, <code>ab</code>, <code>center</code>, <code>axial</code></span>
+        <code>.rep</code><span>replicate number</span>
+        <code>Y</code><span>yield, to be filled with results</span>
+      </div>
+      <pre>fp_design_matrix(3, rep = 2) <span class="c"># 2·2³</span>
+fp_design_matrix(~Speed*Weight)
+fp_design_matrix(2, levels = -1:1) <span class="c"># 3²</span></pre>
+      <p class="note">Custom factor names break the alias analysis of fractional plans: prefer <code>fp_add_names()</code>.</p>
+      <div class="fn"><code><b>fp_info</b>(x)</code><span>Print the plan's properties: defining relationship, factors, levels, fractions, type (<i>plain</i>, <i>fractional</i>, <i>centered</i>, <i>composite</i>).</span></div>
+      <div class="fn"><code><b>fp_treatments</b>(3)</code><span>Treatment codes in Yates' order: <code>(1) a b ab c ac bc abc</code></span></div>
+    </section>
+    <section class="box">
+      <h2 style="font-size:11pt">Typical workflow</h2>
+<pre style="margin:0;background:white"><span class="c"># 1 design; run tests in RunOrder</span>
+fp &lt;- fp_design_matrix(4) %&gt;%
+  fp_write_csv("plan.csv")
+<span class="c"># 2 load results, fit, screen effects</span>
+fp &lt;- fp %&gt;% fp_read_csv("plan.csv")
+m &lt;- lm(Y ~ A*B*C*D, data = fp)
+daniel_plot_hn(m)
+<span class="c"># 3 reduce the model</span>
+anova(lm(Y ~ A*C + A*D, data = fp))</pre>
+    </section>
+  </div>
+
+  <!-- column 2 -->
+  <div class="col">
+    <section>
+      <h2>Names &amp; scales</h2>
+      <p>Attach real-world meaning to coded factors; stored as plan attributes.</p>
+      <div class="fn"><code><b>fp_add_names</b>(dm, ...)</code><span>Long names, e.g. <code>A = "Temperature (°C)"</code></span></div>
+      <div class="fn"><code><b>fp_add_scale</b>(dm, ..., suffix = "_s")</code><span>Add columns with factors in physical units, from <code>c(low, high)</code> ranges.</span></div>
+<pre>fp &lt;- fp_design_matrix(2) %&gt;%
+  fp_add_names(A = "Temperature (°C)",
+    B = "Pressure (bar)") %&gt;%
+  fp_add_scale(A = c(20,30), B = c(2,3))</pre>
+      <table class="dm">
+        <tr><th>.treat</th><th class="f">A</th><th class="f">B</th><th class="s">A_s</th><th class="s">B_s</th><th>Y</th></tr>
+        <tr><td>(1)</td><td class="f">-1</td><td class="f">-1</td><td class="s">20</td><td class="s">2</td><td>NA</td></tr>
+        <tr><td>a</td><td class="f">1</td><td class="f">-1</td><td class="s">30</td><td class="s">2</td><td>NA</td></tr>
+        <tr><td>b</td><td class="f">-1</td><td class="f">1</td><td class="s">20</td><td class="s">3</td><td>NA</td></tr>
+        <tr><td>ab</td><td class="f">1</td><td class="f">1</td><td class="s">30</td><td class="s">3</td><td>NA</td></tr>
+      </table>
+      <div class="fn"><code><b>fp_name</b>(fp, "A")</code><span>→ <code>"Temperature (°C)"</code></span></div>
+      <div class="fn"><code><b>fp_scale</b>(fp, "A")</code><span>→ <code>c(20, 30)</code></span></div>
+      <div class="fn"><code><b>fp_scaled_axis</b>(fp, "A")</code><span>A ggplot2 secondary axis showing physical units and the factor name.</span></div>
+<pre>... + scale_x_continuous(sec.axis =
+    <b>fp_scaled_axis</b>(fp, "A")) +
+  labs(colour = <b>fp_name</b>(fp, "B"))</pre>
+      <div class="figrow">
+        <img src="figures/interaction.png" alt="Interaction plot with secondary temperature axis">
+        <img src="figures/surface.png" alt="Response surface with secondary axes in physical units">
+      </div>
+      <p class="note">Interaction plot and response surface, coded units below/left, physical units above/right.</p>
+    </section>
+  </div>
+
+  <!-- column 3 -->
+  <div class="col">
+    <section>
+      <h2>Augment the plan</h2>
+      <div class="fig">
+        <img src="figures/ccd.png" style="width:0.95in" alt="Central composite design: factorial, center and axial points">
+        <div>
+          <div class="fn"><code><b>fp_augment_center</b>(dm, rep = 5)</code><span><span class="chip" style="background:var(--orange)"></span>Add replicated center points to test for curvature.</span></div>
+          <div class="fn"><code><b>fp_augment_axial</b>(dm, rep = 1)</code><span><span class="chip" style="background:var(--green)"></span>Add axial points at ±2<sup>n/4</sup> → rotatable central composite design (CCD).</span></div>
+        </div>
+      </div>
+<pre>fp_design_matrix(2, rep = 3) %&gt;%
+  fp_augment_center(rep = 4) %&gt;%
+  fp_augment_axial(rep = 2)</pre>
+      <p class="note">Center points first; if <code>I(A^2)</code> turns out significant, add axial points and fit the quadratic terms.</p>
+    </section>
+    <section>
+      <h2>Fractional plans</h2>
+      <div class="fig">
+        <img src="figures/cube_fraction.png" style="width:0.95in" alt="Half fraction of a 2^3 cube: I = ABC">
+        <div>
+          <div class="fn"><code><b>fp_fraction</b>(dm, formula, remove = TRUE)</code><span>Keep the ½ fraction where the defining relationship <code>I = ABC</code>, written <code>~A*B*C</code>, is +1. Repeat <i>p</i> times for a 2<sup>n−p</sup> plan.</span></div>
+        </div>
+      </div>
+<pre><span class="c"># 2^(5-2) plan, I=ABCD=BCDE</span>
+fp_design_matrix(5) %&gt;%
+  fp_fraction(~A*B*C*D) %&gt;%
+  fp_fraction(~B*C*D*E)</pre>
+      <p><code>remove = FALSE</code> keeps both halves and adds an <code>ABC</code> column to <code>filter(ABC == 1)</code> later. <span class="note">The option is sticky in later calls.</span></p>
+    </section>
+    <section>
+      <h2>Save &amp; load</h2>
+      <div class="flow">
+        <div><code><b>fp_write_csv</b>()</code><br>sorted by RunOrder</div><i>→</i>
+        <div class="mid">fill in <code>Y</code><br>in the lab</div><i>→</i>
+        <div><code><b>fp_read_csv</b>()</code><br>back to StdOrder</div>
+      </div>
+<pre>dm %&gt;% fp_write_csv("plan.csv")
+dm &lt;- dm %&gt;% fp_read_csv("plan.csv")</pre>
+      <p class="note">Plan attributes travel as <code>#</code> comments; <code>type = 2</code> uses <code>;</code> separators. <code>fp_write_csv()</code> returns <code>dm</code> invisibly.</p>
+    </section>
+  </div>
+
+  <!-- column 4 -->
+  <div class="col">
+    <section>
+      <h2>Aliases &amp; defining relationships</h2>
+      <h3>One defining relationship</h3>
+      <div class="fn"><code><b>fp_defrel</b>(~A*B*C)</code><span>Build a defining relationship (also <code>fp_defrel(3)</code>).</span></div>
+      <div class="fn"><code><b>fp_effect_names</b>(~A*B*C)</code><span>All effects: <code>A B AB C AC BC ABC</code></span></div>
+      <div class="fn"><code><b>fp_alias_list</b>(~A*B*C*D)</code><span>Named list of aliases: <code>$A "BCD"</code>, <code>$AB "CD"</code>, …</span></div>
+      <div class="fn"><code><b>fp_alias</b>(~A*B*C*D)</code><span>Logical effect × effect alias table.</span></div>
+      <div class="fn"><code><b>fp_gen2alias</b>("ABCD", "BD")</code><span>Alias of an effect given a generator → <code>"AC"</code></span></div>
+      <h3>Several defining relationships</h3>
+      <div class="fn"><code><b>fp_all_drs</b>(~A*B*C, ~B*C*D)</code><span>Add the dependent one: <code>~A*B*C, ~B*C*D, ~A*D</code></span></div>
+      <div class="fn"><code><b>fp_merge_drs</b>(~A*B*C, ~B*C*D)</code><span>The merged one: <code>~A*B*C*D</code></span></div>
+      <div class="fn"><code><b>fp_alias_matrix</b>(...)</code><span>Alias matrix from formulas or from a fractional plan; cells tell which DR causes the alias. Has <code>plot()</code> and <code>as_tibble()</code> methods.</span></div>
+      <div class="fig">
+        <img src="figures/alias_matrix.png" style="width:1.25in" alt="Alias matrix plot">
+        <div>
+<pre style="margin:0">fp_alias_matrix(
+  ~A*B*C,
+  ~B*C*D) %&gt;%
+  plot()</pre>
+          <p class="note" style="margin-top:3px">Colour = generating DR: <code>ABC</code>, <code>BCD</code> or <code>AD</code>.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<footer>
+  <span>CC BY 4.0 Paolo Bosetti • University of Trento • Learn more at <a href="https://github.com/pbosetti/adas.utils">github.com/pbosetti/adas.utils</a> • Install: <code>install.packages("adas.utils")</code></span>
+  <span>adas.utils 1.4.1 • Updated: 2026-10</span>
+</footer>
+</div>
+
+<!-- ============================== PAGE 2 ============================== -->
+<div class="page">
+<header>
+  <svg viewBox="0 0 120 138" aria-label="adas.utils hex logo">
+    <polygon points="60,3 116,35 116,103 60,135 4,103 4,35" fill="#1d5c8a" stroke="#e0731f" stroke-width="5"/>
+    <g fill="#9fc1dc"><rect x="28" y="66" width="11" height="22"/><rect x="41" y="74" width="11" height="14"/><rect x="54" y="78" width="11" height="10"/><rect x="67" y="81" width="11" height="7"/><rect x="80" y="84" width="11" height="4"/></g>
+    <polyline points="33,60 47,44 60,34 73,28 86,25" fill="none" stroke="#e0731f" stroke-width="3"/>
+    <g fill="#e0731f"><circle cx="33" cy="60" r="3"/><circle cx="47" cy="44" r="3"/><circle cx="60" cy="34" r="3"/><circle cx="73" cy="28" r="3"/><circle cx="86" cy="25" r="3"/></g>
+    <text x="60" y="110" text-anchor="middle" font-family="Source Sans 3, Helvetica, Arial" font-weight="700" font-size="19" fill="#fff">adas.utils</text>
+  </svg>
+  <div>
+    <h1>Statistics &amp; plots with <span>adas.utils</span> <small>:: CHEATSHEET</small></h1>
+    <p class="intro">Screening plots for unreplicated factorial plans, <b>ggplot2</b> layers for half-normal and Pareto charts, outlier and normality checks, multiple comparisons, and <b>modelr</b>-style helpers for predictions and residuals. All plots return <code>ggplot</code> objects: add layers and themes with <code>+</code>.</p>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- column 1 -->
+  <div class="col">
+    <section>
+      <h2>Screen the effects</h2>
+      <p>For <b>unreplicated</b> 2<sup>n</sup> plans there are no residual degrees of freedom: significant effects are the ones that stand out from the normal line.</p>
+<pre>m &lt;- lm(Y ~ A*B*C*D, data = filtration)</pre>
+      <div class="fig">
+        <img src="figures/daniel_qq.png" style="width:1.3in" alt="Daniel QQ plot of effects">
+        <div class="fn"><code><b>daniel_plot_qq</b>(m)</code><span>Normal QQ plot of the effects, every effect labelled.</span><span><code>alpha</code>, <code>xlim</code></span></div>
+      </div>
+      <div class="fig">
+        <img src="figures/daniel_hn.png" style="width:1.3in" alt="Daniel half-normal plot of effects">
+        <div class="fn"><code><b>daniel_plot_hn</b>(m, label_n = 6)</code><span>Half-normal plot of |effects|, labels the top <code>label_n</code>. <code>line.p = c(0, 0.4)</code> fits the line through the origin.</span></div>
+      </div>
+      <div class="fig">
+        <img src="figures/pareto_lm.png" style="width:1.3in" alt="Pareto chart of model effects">
+        <div class="fn"><code><b>pareto_chart</b>(m)</code><span>Sorted |effects| coloured by sign, plus cumulative %.</span><span><code>pareto_chart(df, labels, values)</code> for a data frame.</span></div>
+      </div>
+      <p class="note">Here: <code>B</code> is not significant, reduce to <code>Y ~ A*C + A*D</code>.</p>
+    </section>
+  </div>
+
+  <!-- column 2 -->
+  <div class="col">
+    <section>
+      <h2>ggplot2 layers</h2>
+      <h3>Half-normal QQ</h3>
+      <p>Map <code>aes(sample = ...)</code>, optionally <code>labels = ...</code>; works with <code>group</code>/<code>colour</code>.</p>
+      <div class="fn"><code><b>geom_qqhn</b>(label_n = 0, abs_sample = TRUE)</code><span>Points; label the <code>label_n</code> largest.</span></div>
+      <div class="fn"><code><b>geom_qqhn_line</b>(line.p = 0.25)</code><span>Reference line through the given quantiles.</span></div>
+      <div class="fn"><code><b>geom_qqhn_band</b>(line.p, conf.level = 0.95)</code><span>Confidence band around the line.</span></div>
+      <div class="fig">
+        <img src="figures/qqhn.png" style="width:1.12in" alt="Grouped half-normal QQ plot with bands">
+<pre>ggplot(df, aes(
+ sample = value,
+ colour = group)) +
+ geom_qqhn() +
+ geom_qqhn_line() +
+ geom_qqhn_band()</pre>
+      </div>
+      <h3>Pareto</h3>
+      <p>Map <code>aes(x = category, y = value)</code>; bars are sorted by |value|.</p>
+      <div class="fn"><code><b>geom_pareto_bars</b>()</code><span>Sorted bars of |value|.</span></div>
+      <div class="fn"><code><b>geom_pareto_line</b>(cumulative = "raw")</code><br><code><b>geom_pareto_point</b>(cumulative = "raw")</code><span>Cumulative line and points; <code>"proportion"</code> for 0–1.</span></div>
+      <div class="fn"><code><b>scale_y_pareto</b>(percent_name = "Cumulative (%)")</code><span>y scale with a secondary cumulative % axis.</span></div>
+      <div class="fig">
+        <img src="figures/pareto_geom.png" style="width:1.12in" alt="Pareto chart built from ggplot2 layers">
+<pre>ggplot(df,
+ aes(cat, val)) +
+ geom_pareto_bars() +
+ geom_pareto_line() +
+ geom_pareto_point() +
+ scale_y_pareto()</pre>
+      </div>
+      <p class="note">Each <code>geom_*</code> has a matching <code>stat_*</code>: <code>stat_qqhn()</code>, <code>stat_qqhn_line()</code>, <code>stat_qqhn_band()</code>, <code>stat_pareto_bars()</code>, <code>stat_pareto_line()</code>.</p>
+    </section>
+  </div>
+
+  <!-- column 3 -->
+  <div class="col">
+    <section>
+      <h2>Tests &amp; diagnostics</h2>
+      <h3>Outliers</h3>
+      <div class="fig">
+        <img src="figures/chauvenet.png" style="width:1.15in" alt="Sample with one suspect outlier">
+        <div class="fn"><code><b>chauvenet</b>(x, threshold = 0.5)</code><span>Chauvenet's criterion: reject the most extreme value if its expected frequency is below <code>threshold</code>.</span></div>
+      </div>
+<pre>chauvenet(x)
+<span class="c">#&gt; Suspect outlier: 21, value 6</span>
+<span class="c">#&gt; Decision: reject it</span></pre>
+      <p class="note">Returns a list with <code>index</code>, <code>value</code>, <code>expected</code>, <code>reject</code>.</p>
+      <h3>Normality</h3>
+      <div class="fig">
+        <img src="figures/normplot.png" style="width:1.3in" alt="Normal probability plot">
+        <div class="fn"><code><b>normplot</b>(data, var, breaks, linecolor = "red")</code><span>Normal probability plot: an alternative to the QQ plot with a probability axis.</span></div>
+      </div>
+      <h3>Multiple comparisons</h3>
+      <div class="fn"><code><b>ggTukey</b>(obj, ...)</code><span>Plot Tukey's HSD intervals with ggplot2. Accepts a <code>TukeyHSD</code> object (<code>which = 1</code>), or a data frame and a formula, optionally split by a second factor.</span></div>
+      <img src="figures/tukey.png" style="width:100%;border:1px solid #e3e8ee;border-radius:3px" alt="Tukey HSD intervals by material">
+<pre>aov(Response ~ Temperature, df) %&gt;%
+  TukeyHSD() %&gt;% ggTukey()
+df %&gt;% ggTukey(Response ~ Temperature,
+               splt = ~Material)</pre>
+    </section>
+  </div>
+
+  <!-- column 4 -->
+  <div class="col">
+    <section>
+      <h2>Models: predictions &amp; residuals</h2>
+      <p>Pipe-friendly helpers from the retired <b>modelr</b> package.</p>
+      <div class="fn"><code><b>add_predictions</b>(data, model, var = "pred", ...)</code><span><code>...</code> goes to <code>predict()</code>: <code>interval = "confidence"</code> adds <code>fit</code>, <code>lwr</code>, <code>upr</code>.</span></div>
+      <div class="fn"><code><b>add_residuals</b>(data, model, var = "resid")</code></div>
+      <div class="fn"><code><b>spread_predictions</b>(data, m1, m2)</code><br><code><b>spread_residuals</b>(data, m1, m2)</code><span>One column per model.</span></div>
+      <div class="fn"><code><b>gather_predictions</b>(data, m1, m2)</code><br><code><b>gather_residuals</b>(data, m1, m2)</code><span>Long format, with a <code>model</code> column.</span></div>
+<pre>fp %&gt;%
+  add_predictions(m, interval =
+    "confidence") %&gt;%
+  ggplot(aes(A, fit)) +
+  geom_ribbon(aes(ymin=lwr, ymax=upr)) +
+  geom_line()</pre>
+      <div class="fn"><code><b>expand_formula</b>(Y ~ (A + B)^3)</code><span>→ <code>Y ~ A + B + A:B</code></span></div>
+    </section>
+    <section>
+      <h2>Data</h2>
+      <div class="fn"><code><b>examples_url</b>("battery.dat")</code><span>URL of a course dataset, ready for reading:</span></div>
+<pre>examples_url("battery.dat") %&gt;%
+  read.table(header = TRUE)</pre>
+      <h3>Bundled datasets</h3>
+      <div class="fn"><code><b>filtration</b></code><span>Unreplicated 2<sup>4</sup>: filtration speed vs. temperature, pressure, concentration, agitation.</span></div>
+      <div class="fn"><code><b>battery</b></code><span>3² × 4 reps: battery life vs. temperature and plate material.</span></div>
+      <div class="fn"><code><b>cotton</b></code><span>One-way, 5 levels: yarn strength vs. cotton %.</span></div>
+      <div class="fn"><code><b>ccd_experiment_yield</b></code><span>List of <code>base</code>, <code>center</code>, <code>axial</code> yields for a sequential 2-factor CCD.</span></div>
+    </section>
+  </div>
+</div>
+
+<footer>
+  <span>CC BY 4.0 Paolo Bosetti • University of Trento • Learn more at <a href="https://github.com/pbosetti/adas.utils">github.com/pbosetti/adas.utils</a> • Course: <a href="https://paolobosetti.quarto.pub/ADAS/">paolobosetti.quarto.pub/ADAS</a></span>
+  <span>adas.utils 1.4.1 • Updated: 2026-10</span>
+</footer>
+</div>
+
+</body>
+</html>

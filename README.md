@@ -17,6 +17,10 @@ in the course *Analysis of Data and Statistics* at the University of
 Trento, Italy. Course contents are on
 <https://paolobosetti.quarto.pub/ADAS/>.
 
+## Cheatsheet
+
+<a href="https://github.com/pbosetti/adas.utils/blob/main/cheatsheet/adas.utils-cheatsheet.pdf"><img src="man/figures/README-cheatsheet.png" width="400" alt="adas.utils cheatsheet"/></a>
+
 ## Installation
 
 You can install the development version of adas.utils from
